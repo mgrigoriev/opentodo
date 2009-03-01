@@ -1,0 +1,110 @@
+{% extends "todo.html" %}
+{% load todo_extras %}
+
+{% block extra_media %}
+{{f.media}}
+{% include "extra_css.html" %}
+{% endblock %}
+
+{% block title %}{{task}}{% endblock %}
+
+
+{% block left %}
+
+<div>
+<b>Проект</b><br />
+<span><a href="{% url project_details task.project.id %}">{{task.project.title}}</a></span>
+</div>
+
+<div class="top-indent">
+<b>Автор</b><br />
+<span>{{task.author|username}}</span>
+</div>
+
+<div class="top-indent">
+<b>Добавлена</b><br />
+<span>{{task.created_at|format_date:"short"}}</span>
+</div>
+
+<div class="top-indent">
+<b>Ответственный</b><br />
+{% if task.assigned_to %}
+<span>{{task.assigned_to|username}}</span>
+{% else %}
+<span>не назначен</span>
+{% endif %}
+</div>
+
+{% if task.deadline %}
+<div class="top-indent">
+<b>Срок</b><br />
+<span>{{task.deadline|format_deadline:task.status.id}}</span>
+</div>
+{% endif %}
+
+{% ifequal task.author user %}
+	{% include "todo/task_actions.html" %}
+{% else %}
+	{% if perms.todo.change_task %}
+		{% include "todo/task_actions.html" %}
+	{% endif %}
+{% endifequal %}
+
+{% endblock %}
+
+
+{% block content %}
+<div id="task-container">
+
+<h2 id="task-title">{{task.title}}</h2>
+{% if task.info %}<div id="task-info">{{task.info|linebreaksbr}}</div>{% endif %}
+</div>
+
+<div id="task-action">
+
+<table cellpadding="0" cellspacing="0" border="0"><tr>
+<td style="vertical-align:middle;padding-left:0px">
+<div class="status status{{task.status.id}}" style="display:inline">&nbsp;{% ifequal task.status.id 4 %}завершена{% else %}{{task.status.title|lower}}{% endifequal %}&nbsp;</div>
+</td>
+
+<td style="padding-left:10px">
+
+{% ifequal task.status.id 1 %}
+	{% ifequal task.assigned_to.id user.id %}
+		<a class="button" href="{% url task_to_accepted task.id %}"><span>Принять</span></a>
+	{% else %}&nbsp;{% endifequal %}
+{% endifequal %}
+{% ifequal task.status.id 2 %}
+	{% ifequal task.assigned_to.id user.id %}
+		<a class="button" href="{% url task_to_done task.id %}"><span>Завершить</span></a>
+	{% else %}&nbsp;{% endifequal %}
+{% endifequal %}
+{% ifequal task.status.id 3 %}
+	{% ifequal task.author.id user.id %}
+		<a class="button" href="{% url task_to_checked task.id %}"><span><b>Одобрить</b></span></a><a class="button" href="{% url task_to_new task.id %}"><span>Открыть&nbsp;заново</span></a>
+	{% else %}&nbsp;{% endifequal %}
+{% endifequal %}
+{% ifequal task.status.id 4 %}
+	{% ifequal task.author.id user.id %}
+		<a class="button" href="{% url task_to_new task.id %}"><span>Открыть&nbsp;заново</span></a>
+	{% else %}&nbsp;{% endifequal %}
+{% endifequal %}
+
+</td>
+<td style="vertical-align:middle;padding-left:50px"><a href="{% url tasks_list %}" class="bigger">Назад к задачам &rarr;</a></td>
+</tr></table>
+
+</div>
+
+
+<div id="task-extra">
+
+<a name="files"></a>
+{% include "todo/files.html" %}
+
+<a name="comments"></a>
+{% include "todo/task_comments.html" %}
+
+</div>
+
+{% endblock %}

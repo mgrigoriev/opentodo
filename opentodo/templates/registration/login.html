@@ -1,0 +1,77 @@
+{% load todo_extras %}
+<html>
+<head>
+<title>Авторизация | opentodo</title>
+<style type="text/css">
+body {
+  text-align: center;
+  background-color: #eee;
+}
+body, td {
+  font-size: 11pt;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #000;
+}
+input#id_username, input#id_password {
+	width: 200px;
+	font-size:11pt;
+}
+label {
+	color: #888; font-family: Tahoma;
+}
+.logo {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 16pt;
+	padding-bottom: 10px;
+	color: #000;
+}
+#content {
+  text-align: left;
+  width: 400px;
+  margin: 100px auto;
+}
+</style>
+<script language="javascript"> 
+function setFocus() {
+	if (document.getElementById("id_username").value == "") {
+		document.getElementById("id_username").focus();
+	} else if (document.getElementById("id_password").value == "") {
+		document.getElementById("id_password").focus();
+	}
+{% ifequal HOST 'demo.opentodo.ru' %}
+//	если демо-версия - автологин
+	document.getElementById("id_username").value = 'demo';
+	document.getElementById("id_password").value = 'demo';
+	document.getElementById("id_submit").focus();
+	document.getElementById("id_loginform").submit();
+{% endifequal %}
+}
+</script> 
+</head>
+<body onLoad="setFocus();">
+<div id="content">
+<table cellspacing=0 width=400 align=center><tr><td style="border: 5px solid #ddd; padding-left: 31; padding-bottom: 30; padding-top: 22;background-color: #fff"> 
+	{% if not user.is_authenticated %}
+		{% if form.has_errors %}
+		<div class="error">Неправильный логин или пароль</div>
+		{% endif %}
+		<form method="post" action="." id="id_loginform">
+		<table>
+		<tr><td></td><td class="logo"><span style="padding-right: 2px;">open</span><b>todo</b></td></tr>
+		<tr><td><label for="id_username">Логин:</label></td><td>{{ form.username }}</td></tr>
+		<tr><td><label for="id_password">Пароль:&nbsp;</label></td><td>{{ form.password }}</td></tr>
+		<tr><td>&nbsp;</td><td><input type="submit" value="Войти" id="id_submit" /></td></tr>
+		{% ifequal HOST 'demo.opentodo.ru' %}
+			<tr><td>&nbsp;</td>
+			<td style="padding-top:10px;">Логин / пароль: <i><b><span style="color:green">demo / demo</span></b></i></td></tr>
+		{% endifequal %}
+		</table>
+		<input type="hidden" name="next" value="{{ next }}" />
+		</form>
+	{% else %}
+		Вы вошли как {{ user|username}})
+	{% endif %}
+</td></tr></table>
+</div>
+</body>
+</html>

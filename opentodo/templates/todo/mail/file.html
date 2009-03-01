@@ -1,0 +1,5 @@
+{% load todo_extras %}Задача: {{t.title}}
+
+Файл: {{a.attached_file.name|attach}}
+
+http://{{host}}{% url task_details t.id %}#files

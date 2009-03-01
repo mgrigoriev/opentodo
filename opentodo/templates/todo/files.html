@@ -1,0 +1,66 @@
+{% load todo_extras %}
+
+<script type="text/javascript"> 
+$(document).ready(function(){
+	if ($("#attach_form").is(':visible')) {
+		$("#add_file_link").hide();
+	}
+	$("#add_file_link").click(function () {
+		$("#attach_form").toggle();
+		if ($("#attach_form").is(':visible')) {
+			$("#add_file_link").hide();
+		}
+	});
+	$("#hide_link").click(function () {
+		$("#attach_form").hide();
+		$(".formErrors").hide();
+		$("#add_file_link").show();
+		$("#id_attached_file").removeClass('invalidInput');
+	});
+
+	$("#id_attached_file").attr("required", "true");
+	
+	$('#attach_form').formValidation({
+		err_class: "invalidInput",
+		display_alert: false
+	});
+
+});
+</script>
+
+<h1 style="display:inline">Файлы</h1>&nbsp;&nbsp;<a href="#" id="add_file_link" class="do">добавить файл</a><br /><br />
+
+<form method="post" enctype="multipart/form-data" id="attach_form" {% if not f.errors %}style="display:none"{% endif %}>
+<div class="editformWrapper" style="margin-bottom:20px; width: 600px">
+<div class="formErrors">
+{% if f.attached_file.errors %}Не выбран файл<br />{% endif %}
+</div>
+Файл: {{f.attached_file}} <input type="submit" value="Загрузить" />&nbsp;&nbsp;<a href="#" id="hide_link">отмена</a>
+</div>
+</form>
+
+{% if attachments %}
+<div class="attachments">
+
+{% for a in attachments %}
+<a href="{{ a.attached_file.url }}">{{a.attached_file.name|attach}}</a> ({{a.attached_file.size|kilobytes}} Кб) &#151; {{a.author|username}}, {{a.created_at|format_date}}
+
+{% ifequal a.author user %}
+	{% include "todo/file_actions.html" %}
+{% else %}
+	{% ifequal menu_active 'tasks' %}
+		{% if perms.todo.delete_taskattach %}
+			{% include "todo/file_actions.html" %}
+		{% endif %}
+	{% else %}{% ifequal menu_active 'projects' %}
+		{% if perms.todo.delete_projectattach %}
+			{% include "todo/file_actions.html" %}
+		{% endif %}
+	{% endifequal %}{% endifequal %}
+{% endifequal %}
+
+<br />
+{% endfor %}
+
+</div>
+{% endif %}

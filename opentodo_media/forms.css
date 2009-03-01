@@ -1,0 +1,77 @@
+form {
+	margin: 0;
+	padding: 0;
+}
+fieldset {
+	color: #555;
+	border: 1px solid #ddd;
+	padding: 15px;
+	background-color: #f9f9f9;
+}
+input, textarea, select {
+	font-family: Arial;
+
+}
+.button {
+ font-weight: normal;
+ font-family: Arial;
+}
+.formErrors {
+	color: red;
+	padding-bottom: 7px;
+}
+.invalidInput {
+	border:1px solid #ff9999;
+	background-color: #FFECE6;
+}
+div.editformWrapper {
+	background-color: #f2f2f2; /*#f0efe4;#d4edc9;*/
+	border: 3px solid #e9e9e9;
+	padding: 20px;
+}
+#editform div.fieldWrapper {
+	padding-bottom: 5px;
+}
+#editform div.fieldWrapperIndent {
+	padding-top: 10px;
+}
+#editform label {
+	float: left;
+	padding: 0 10px;
+	text-align: right;
+	width: 130px;
+	color: #333;
+	font-size:10pt;
+}
+#editform br {
+	clear: left;
+}
+#editform textarea {
+	width: 600px;
+}
+#editform #id_title {
+	width: 600px;
+	height: 35px;
+}
+input.button {
+	padding: 1px 8px;
+	margin-right: 8px;
+}
+#id_deadline {
+	width: 100px;
+}
+.datepicker_trigger {
+	border:0px;
+	cursor: pointer; cursor: hand;
+}
+
+#comment-form textarea {
+	font-size: 10pt;
+	width: 670px;
+}
+#comment-form .button {
+	margin-top: 5px;
+}
+#attach_form input#id_title {
+	width: 300px;
+}

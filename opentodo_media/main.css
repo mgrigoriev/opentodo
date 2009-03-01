@@ -1,0 +1,306 @@
+body, html {
+	margin:0;
+}
+img {
+	border:0;
+	vertical-align:middle;
+}
+
+/**********************/
+#top {
+	border-bottom: 1px solid #ddd;
+	height: 38px;
+	min-width: 500px;
+}
+
+#leftcol {
+	position: absolute;	top: 92px;
+	width: 190px;
+}
+
+#left-wrapper {
+	padding-left: 20px;
+	min-width: 170px;
+	width: 170px;
+}
+
+#content-wrapper {
+	margin-right: 20px;
+}
+
+#logo-wrapper {
+	position: absolute; left: 20px; top: 10px;
+	width:150px;
+}
+
+#logo-wrapper a.logo, #logo-wrapper a.logo:visited {
+	font: 17px Arial, Helvetica, sans-serif;
+	text-decoration: none;
+	color: #000;
+}
+
+#top-menu {
+	position: absolute; left: 190px; top: 10px;
+	background-color: #fff;
+	
+}
+
+#top-right {
+	float:right;
+	margin: 10px 20px 0 0;
+	z-index: -1;
+}
+/**********************/
+
+body, th, td {
+	font: 10pt/150% Arial, Helvetica, sans-serif;
+	color: #000;
+}
+h1 {
+	font: normal 145% Arial, Helvetica, sans-serif;
+	color: #000;
+	padding: 0 0 0 0;
+}
+.bigger {
+	font-size: 11pt;
+}
+a, a:visited {
+	color: #3333cc;
+}
+td.top a.logo, td.top a.logo:visited {
+	font: 17px Arial, Helvetica, sans-serif;
+	text-decoration: none;
+	color: #000;
+}
+a.comment, a.comment:visited {
+	color: #888;
+	text-decoration: none;
+}
+a.action1, a.action1:visited {
+	font-weight: bold;
+}
+a.active, a.active:visited {
+	color: black;
+}
+a.todolist, a.todolist:visited {
+	color: #222;
+	font-weight:bold;
+	text-decoration: none;
+}
+a.todolist:hover {
+	border-bottom: 2px solid #ddd;
+}
+a.do, a.do:visited {
+	font-weight:normal;
+	text-decoration:none;
+	font-style: italic;
+	color: #009900;
+	border-bottom: 1px dashed #009900;
+}
+table.common th a, table.common th a:visited {
+	color: #fff;
+	text-decoration: none;
+}
+table.common th.active a, table.common th.active a:visited {
+	color: #000;
+}
+td {
+	vertical-align: top;
+}
+th {
+	text-align: left;
+	font: normal 10pt Arial;
+}
+.red {
+	color: #dd0000;
+}
+
+/***********************************/
+/* Список задач                    */
+#task-list-top {
+	width:100%;
+}
+
+h1#todolist {
+	display: inline;
+	padding-right: 5px
+}
+#filter-wrapper {
+	padding-top: 46px;
+}
+#leftmenu div {
+	padding: 1px 5px 1px 10px;
+	margin-bottom: 2px;
+}
+#leftmenu .selected {
+	background-color:  #839097; /*#ddd;*/
+}
+#leftmenu a, #leftmenu a:visited {
+	text-decoration:none;
+}
+#leftmenu .selected a, #leftmenu .selected a:visited {
+	font-weight: bold;
+	color: #fff;
+	text-decoration:none;
+}
+#leftmenu .indent {
+	margin-top: 20px;
+}
+
+#prjform {
+	margin:0;
+	padding:0;
+	padding-bottom: 20px;
+}
+
+#task-list {
+max-width:1200px;
+}
+
+a.hide-closed, a.hide-closed:visited {
+	color: #999;
+}
+a.show-closed, a.show-closed:visited {
+	color: #99CC99;
+}
+
+table.common td {
+	padding: 2px 10px 4px 5px;
+}
+table.common th {
+	padding: 3px 10px 3px 5px;
+	vertical-align: top;
+}
+
+table.common td {
+	border-bottom: 1px solid #cfcfcf;
+	vertical-align: top;
+}
+table.common th {
+	border-bottom: 1px solid #bbb; 
+	border-top: 0px solid #ccc; 
+	background-color: #839097;
+	font-weight: normal;
+}
+table.common th.left, table.common td.left {
+	border-left: 3px solid  #839097;
+	padding-left: 20px;
+}
+table.common th.active {
+	background-color: #d5dee3;
+
+}
+td.center, th.center {
+	text-align: center;
+}
+table.common td.bottom {
+	border:0;
+	border-top: 2px solid  #839097;
+}
+div.status {
+	margin-top: 2px;
+	padding: 1px 4px 3px 4px;
+	font-size: 12px;
+	line-height: 12px;
+	width: 62px;
+	vertical-align:middle;
+}
+
+div.status1 {
+	background-color: #ffcccc;
+	color: #ba1717;
+}
+div.status2 {
+	background-color: #ffe376;
+	color: #912402;
+/*
+	background-color: #b1d2fd;
+	color: #11407b;
+*/
+}
+div.status3 {
+	background-color: #bcf187;
+	color: #006600;
+}
+div.status4 {
+	background-color: #ddd;
+	color: #777;
+}
+/*
+div.status1 {
+	background-color: #f2bf28;
+}
+div.status2 {
+	background-color: #318ac8;
+}
+div.status3 {
+	background-color: #7aca12;
+}
+div.status4 {
+	background-color: #aaadaf;
+}
+*/
+
+tr.grey td {
+	background-color: #f5f5f5;
+}
+tr.grey td a.todolist, tr.grey td a.todolist:visited, tr.grey td {
+	color: #888;
+	font-weight: normal;
+}
+
+/***********************************/
+/* Страница с детальным описанием  */
+h2#task-title {
+	margin:0;
+	padding-bottom: 0px;
+	font-size:118%;
+	font-weight:bold;
+	color: #000;
+}
+#task-info {
+	padding-top: 10px;
+	font-size: 11pt;
+	line-height:1.4em;
+}
+
+#task-container {
+	width: 50em;
+	padding-bottom:10px;
+}
+
+#task-action {
+	padding: 5px 0 10px 0;
+	margin-bottom: 30px;
+}
+
+div.top-indent {
+	padding-top: 8px;
+	line-height: 1.4em;
+}
+#comment-container {
+	padding-bottom: 0px;
+	font-size:11pt;
+	line-height: 1.4em;
+}
+div.comment {
+	padding-top: 5px;
+	margin-bottom:12px;
+	width: 50em;
+	color: #000;
+
+}
+div.comment-extra {
+	color: #999;
+	font-size: 11pt;
+}
+div.attachments {
+	padding-bottom:20px;
+	line-height:1.7em;
+	font-size: 11pt;
+	color: #999;
+}
+div.attachments table.common td {
+	color: #999;
+	border: 0;
+}

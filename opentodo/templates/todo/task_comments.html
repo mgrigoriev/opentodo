@@ -1,0 +1,29 @@
+{% load todo_extras %}
+
+<h1>Комментарии</h1>
+{% if task.comments.all %}
+<div id="comment-container">
+{% for comment in task.comments.all %}
+	<div class="comment">	
+	{{comment.message|linebreaksbr}}
+	<div class="comment-extra">{{comment.author|username}}, {{comment.created_at|format_date}}
+	{% ifequal comment.author user %}
+		{% include "todo/comment_actions.html" %}
+	{% else %}
+		{% if perms.todo.delete_comment %}
+			{% include "todo/comment_actions.html" %}
+		{% endif %}
+	{% endifequal %}
+	</div>
+	</div>
+{% endfor %}
+</div>
+{% endif %}
+
+<div class="editformWrapper" style="width:700px; margin-top:25px">
+<form method="post" action="{% url add_comment task.id %}" id="comment-form">
+<textarea name="message" rows="6" cols="30"></textarea><br />
+<input type="submit" value="Добавить комментарий" class="button" />
+</form>
+</div>
+<br />

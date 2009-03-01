@@ -1,0 +1,64 @@
+{% load todo_extras %}
+<script type="text/javascript"> 
+$(document).ready(function(){
+	$('#id_deadline').attachDatepicker({showOn:'both', buttonImage:'{{MEDIA_URL}}/img/calendar.gif', buttonImageOnly:true});
+
+	$("#id_project").attr("required", "true");
+	$("#id_title").attr("required", "true");
+	$("#id_deadline").attr("mask", "datemask");
+	
+	$('#editform').formValidation({
+		err_class: "invalidInput",
+		display_alert: false,
+		datemask : /[0-9]{4}-[0-9]{2}-[0-9]{2}/
+	});
+});
+</script> 
+
+<div class="formErrors">
+	{% if form.project.errors %}Не выбран проект<br />{% endif %}
+	{% if form.title.errors %}Не введена задача<br />{% endif %}
+	{% if form.deadline.errors %}Формат даты в поле Срок должен быть yyyy-mm-dd<br />{% endif %}
+</div>
+
+
+<div class="editformWrapper" style="width:780px">
+<form method="post" id="editform">
+	<div class="fieldWrapper">
+		<label for="id_project"><span class="red">*</span> Проект:</label>
+		{{form.project}}
+	</div>
+	<div class="fieldWrapper">
+		<label for="id_title"><span class="red">*</span> Задача:</label>
+		{{form.title}}
+	</div>
+	<div class="fieldWrapper">
+		<label for="id_info">Описание:</label>
+		{{form.info}}
+	</div>
+	<div class="fieldWrapper">
+		<label for="id_deadline">Срок:</label>
+		{{form.deadline}}
+	</div>
+	<div class="fieldWrapper">
+		<label for="id_assigned_to">Ответственный:</label>
+		<select name="assigned_to" id="id_assigned_to"> 
+		<option value="" selected="selected">---------</option>
+	{% for u in users %}
+		<option value="{{u.id}}"{% if add %}{% ifequal u.id user.id %} selected="selected"{% endifequal %}{% else %}{% ifequal u.id task.assigned_to.id %} selected="selected"{% endifequal %}{% endif %}>{{u|username}}</option> 
+	{% endfor %}
+		</select>
+	</div>
+	<div class="fieldWrapper fieldWrapperIndent">
+		<label>&nbsp;</label><input type="submit" value="Сохранить задачу" class="button" /><a href="{% if add %}{% url tasks_list %}{% else %}{% url task_details task.id %}{% endif %}">отмена</a>
+	</div>
+</form>
+</div>
+
+{% if add %}
+<script language="javascript">
+if (document.getElementById('id_project').selectedIndex > 0) {
+	document.getElementById('id_title').focus();
+}
+</script>
+{% endif %}

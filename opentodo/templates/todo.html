@@ -1,0 +1,57 @@
+{% load todo_extras %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Language" content="ru" />
+<title>{% block title %}{% endblock %} | opentodo</title>
+<link rel="stylesheet" type="text/css" media="screen" href="{{MEDIA_URL}}/main.css" />
+<link rel="icon" href="{{MEDIA_URL}}/favicon.png" type="image/x-icon" />
+{% block extra_media %}{% endblock %}
+<style type="text/css">#shadow {background:transparent url('{{MEDIA_URL}}/img/bg.gif') repeat-x scroll 0 0; height:50px;}</style>
+</head>
+
+<body>
+
+<div id="top">
+<!-- top -->
+<div id="logo-wrapper"><a href="{% url tasks_list %}" class="logo"><span style="padding-right: 2px;">open</span><b>todo</b></a></div>
+
+<div id="top-menu"><a href="{% url tasks_list %}"{% ifequal menu_active 'tasks'%}style="color:black"{% endifequal %}>Задачи</a>&nbsp;|&nbsp;<a href="{% url projects_list %}"{% ifequal menu_active 'projects'%}style="color:black"{% endifequal %}>Проекты</a>
+{% if user.is_superuser %}
+|&nbsp;<a href="/admin/" style="color:#aa0033" target="_blank">Администрирование</a>
+{% endif %}
+{% ifequal HOST 'demo.opentodo.ru' %}
+|&nbsp;<a href="http://code.google.com/p/opentodo/" target="_blank" style="color:#aa0033">Страница проекта на Google Code</a>
+{% endifequal %}
+</div>
+
+<div id="top-right">
+{% if user.is_authenticated %}
+	{{user|username}} ({% ifequal HOST 'demo.opentodo.ru' %}<a href="http://code.google.com/p/opentodo">{% else %}<a href="{% url django.contrib.auth.views.logout_then_login %}">{% endifequal %}Выйти</a>)
+{% else %}
+	Вы не авторизованы
+{% endif %}
+</div>
+<!-- /top -->
+</div>
+
+<div id="shadow"></div>
+
+<table cellpadding="0" cellspacing="0" width="100%"> <!-- super all-browser css bug fix :-) -->
+<tr>
+<td style="width:190px">
+<div id="left-wrapper">
+{% block left %}&nbsp;{% endblock %}
+</div>
+</td>
+
+<td style="padding-right:20px">
+{% block content %}&nbsp;{% endblock %}
+{% block bottom %}&nbsp;{% endblock %}
+</td>
+</tr>
+</table>
+
+</body>
+</html>

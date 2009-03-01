@@ -1,0 +1,19 @@
+{% extends "todo.html" %}
+
+{% block title %}Проекты{% endblock %}
+
+{% block left %}
+{% endblock %}
+
+{% block content %}
+
+<h1 style="display: inline; padding-right: 15px">Проекты</h1>
+<a href="{% url add_project %}" class="do">добавить проект</a><br /><br />
+
+{% if projects %}
+{% for p in projects %}
+	<a href="{% url project_details p.id %}" style="font-size:130%; line-height: 175%">{{p.title}}</a>&nbsp;&nbsp;{% if p.files.count %}<a href="{% url project_details p.id %}#files"><img src="{{MEDIA_URL}}/img/attach.gif" style="vertical-align:middle;border:0" /></a>{% endif %}<br />
+{% endfor %}
+{% endif %}
+
+{% endblock %}

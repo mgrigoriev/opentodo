@@ -1,0 +1,33 @@
+# -*- coding: utf-8 -*-
+
+DEBUG = True
+TEMPLATE_DEBUG = DEBUG
+
+DATABASE_ENGINE = 'mysql'        # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'ado_mssql'.
+DATABASE_NAME = 'opentodo'       # Or path to database file if using sqlite3.
+DATABASE_USER = ''               # Not used with sqlite3.
+DATABASE_PASSWORD = ''           # Not used with sqlite3.
+DATABASE_HOST = ''               # Set to empty string for localhost. Not used with sqlite3.
+DATABASE_PORT = ''               # Set to empty string for default. Not used with sqlite3.
+
+# Absolute path to the directory that holds media.
+# MEDIA_ROOT = '/var/www/opentodo_media'
+MEDIA_ROOT = ''
+
+# URL that handles the media served from MEDIA_ROOT.
+# Note that this should have a trailing slash if it has a path component
+# MEDIA_URL = 'http://static.myhost.com' or MEDIA_URL = 'http://myhost.com/static/'
+MEDIA_URL = ''
+
+SEND_EMAILS = False       # make it True and edit settings bellow if you want to receive emails
+EMAIL_HOST = ''           # smtp.myhost.com
+EMAIL_HOST_USER = ''      # user123
+EMAIL_HOST_PASSWORD = ''  # qwerty
+EMAIL_ADDRESS_FROM = ''   # noreply@myhost.com
+if DEBUG:
+    EMAIL_FAIL_SILENTLY = False
+else:
+    EMAIL_FAIL_SILENTLY = True
+
+# Make this unique, and don't share it with anybody.
+SECRET_KEY = 'ih^s_r3qgx!8-7aj%7^tqg#mj&zpdmchbbc=+*9=y#cm&v(ga)'

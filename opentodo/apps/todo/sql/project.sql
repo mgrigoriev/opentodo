@@ -1,0 +1,1 @@
+INSERT INTO todo_project (id, title, info, created_at, author) VALUES ('1', 'Sample Project', 'Это тестовый проект', '2009-01-01', 1);

@@ -1,0 +1,120 @@
+{% extends "todo.html" %}
+{% load todo_extras %}
+
+{% block extra_media %}
+{% include "extra_css.html" %}
+{% endblock %}
+
+{% block title %}Задачи{% endblock %}
+
+{% block left %}
+
+<div id="filter-wrapper">
+
+<form method="get" id="prjform">
+<select name="project_id" onchange="document.getElementById('prjform').submit();"><option value="0">Все проекты</option>
+{% for p in projects %}<option value="{{p.id}}" {% ifequal p.id project.id %} selected{% endifequal %}>{{p.title|crop:"15"}}</option>
+{% endfor %}</select>
+</form>
+
+<div id="leftmenu">
+	<div{% ifequal folder 'inbox' %} class="selected"{% endifequal %}>
+		<a href="{% url tasks_list %}?folder=inbox">Входящие</a>
+	</div>
+	<div{% ifequal folder 'outbox' %} class="selected"{% endifequal %}>
+		<a href="{% url tasks_list %}?folder=outbox">Исходящие</a>
+	</div>
+	<div{% ifequal folder 'all' %} class="selected"{% endifequal %}>
+		<a href="{% url tasks_list %}?folder=all">Все</a>
+	</div>
+<!-- 	<div class="indent">
+		<a href="{% url add_task %}" class="action1">Добавить&nbsp;задачу&nbsp;&rarr;</a>
+	</div> -->
+</div>
+
+
+</div>
+
+{% endblock %}
+
+{% block content %}
+
+<div id="task-list">
+
+<div id="task-list-top">
+	<div style="float:left; margin-bottom:20px;">
+	<h1 id="todolist">
+	{% ifequal folder 'inbox' %}Мои задачи{% endifequal %}
+	{% ifequal folder 'outbox' %}Задачи, назначенные мной{% endifequal %}
+	{% ifequal folder 'all' %}Все задачи{% endifequal %}
+	{% if project %} по проекту {{project.title}}{% endif %}
+	</h1>
+
+	{% if hide_done %}
+		<a href="{% url tasks_list %}?hide_done=0" class="show-closed">показать завершенные</a>
+	{% else %}
+		<a href="{% url tasks_list %}?hide_done=1" class="hide-closed">скрыть завершенные</a>
+	{% endif %}
+	</div>
+
+	<div style="float:right; text-align:right; margin-bottom:20px;">
+	<a class="button" href="{% url add_task %}" style="color:#333"><span>Добавить задачу</span></a>
+	</div>
+</div>
+
+<table class="common" style="clear:both;" cellspacing="0" cellpadding="0" width="100%">
+	<tr>
+		<th class="left{% ifequal order 'task'%} active{% endifequal %}" width="100%"><a href="{% url tasks_list %}?order=task&dir={% ifequal order 'task'%}{% ifequal dir 'asc'%}desc{% else %}asc{% endifequal%}{% else %}asc{% endifequal%}">Задача{% ifequal order 'task'%}{% ifequal dir 'asc'%}&uarr;{% else %}&darr;{% endifequal%}{% endifequal%}</a></th>
+
+		{% if not project %}
+		<th{% ifequal order 'project'%} class="active"{% endifequal %}><a href="{% url tasks_list %}?order=project&dir={% ifequal order 'project'%}{% ifequal dir 'asc'%}desc{% else %}asc{% endifequal%}{% else %}asc{% endifequal%}">Проект{% ifequal order 'project'%}{% ifequal dir 'asc'%}&uarr;{% else %}&darr;{% endifequal%}{% endifequal%}</a></th>
+		{% endif %}
+		
+		<th{% ifequal order 'author'%} class="active"{% endifequal %}><a href="{% url tasks_list %}?order=author&dir={% ifequal order 'author'%}{% ifequal dir 'asc'%}desc{% else %}asc{% endifequal%}{% else %}asc{% endifequal%}">Назначил{% ifequal order 'author'%}{% ifequal dir 'asc'%}&uarr;{% else %}&darr;{% endifequal%}{% endifequal%}</a></th>
+
+		<th {% ifequal order 'created_at'%} class="active"{% endifequal %} style="text-align:right"><a href="{% url tasks_list %}?order=created_at&dir={% ifequal order 'created_at'%}{% ifequal dir 'asc'%}desc{% else %}asc{% endifequal%}{% else %}desc{% endifequal%}">Дата{% ifequal order 'created_at'%}{% ifequal dir 'asc'%}&uarr;{% else %}&darr;{% endifequal%}{% endifequal%}{% if not order %}&darr;{% endif %}</a>&nbsp;</th>
+
+		<th{% ifequal order 'assigned_to'%} class="active"{% endifequal %}><a href="{% url tasks_list %}?order=assigned_to&dir={% ifequal order 'assigned_to'%}{% ifequal dir 'asc'%}desc{% else %}asc{% endifequal%}{% else %}asc{% endifequal%}">Выполняет{% ifequal order 'assigned_to'%}{% ifequal dir 'asc'%}&uarr;{% else %}&darr;{% endifequal%}{% endifequal%}</a></th>
+		
+		<th{% ifequal order 'deadline'%} class="active"{% endifequal %} style="text-align:right"><a href="{% url tasks_list %}?order=deadline&dir={% ifequal order 'deadline'%}{% ifequal dir 'asc'%}desc{% else %}asc{% endifequal%}{% else %}asc{% endifequal%}">Срок{% ifequal order 'deadline'%}{% ifequal dir 'asc'%}&uarr;{% else %}&darr;{% endifequal%}{% endifequal%}</a>&nbsp;</th>
+
+		<th class="{% ifequal order 'status'%} active{% endifequal %}"><a href="{% url tasks_list %}?order=status&dir={% ifequal order 'status'%}{% ifequal dir 'asc'%}desc{% else %}asc{% endifequal%}{% else %}asc{% endifequal%}">Статус{% ifequal order 'status'%}{% ifequal dir 'asc'%}&uarr;{% else %}&darr;{% endifequal%}{% endifequal%}</a></th>
+	</tr>
+{% if tasks %}
+{% for t in tasks %}
+	<tr{% ifequal t.status.id 3 %} class="grey"{% endifequal %}{% ifequal t.status.id 4 %} class="grey"{% endifequal %}>
+
+		<td class="left"><a href="{% url task_details t.id %}" class="todolist">{{t.title}}</a>&nbsp;{% if t.comments.count %}<a href="{% url task_details t.id %}#comments" class="comment">({{ t.comments.count }})</a>{% endif %}&nbsp;&nbsp;{% if t.files.count %}<a href="{% url task_details t.id %}#files"><img src="{{MEDIA_URL}}/img/attach.gif" style="vertical-align:middle;border:0" /></a>{% endif %}</td>
+		{% if not project %}<td><nobr>{{t.project.title}}</nobr></td>{% endif %}
+		<td><nobr>{{t.author|username}}</nobr></td>
+		<td style="text-align:right">{{t.created_at|format_date:"short"}}</td>
+		<td><nobr>{{t.assigned_to|username|default:"&nbsp;"}}</nobr></td>
+		<td style="text-align:right">{{ t.deadline|format_deadline:t.status.id }}</td>
+		<td class="center"><div class="status status{{t.status.id}}">{% ifequal t.status.id 4 %}завершена{% else %}{{t.status.title|lower}}{% endifequal %}</div></td>
+	</tr>
+{% endfor %}
+	<tr><td class="left" colspan="7" height="{{tasks.count|extra_td_height}}">&nbsp;</td></tr>
+{% else %}
+	<tr><td class="left center" colspan="7" height="{{tasks.count|extra_td_height}}"><br /><br /><i>Нет задач, соответствующих параметрам фильтра.</i></td></tr>
+{% endif %}
+	<tr><td colspan="7" class="bottom">&nbsp;</td></tr>
+</table>
+</div>
+{% endblock %}
+
+{% block bottom %}
+
+<div class="pagination">
+{% ifnotequal paginator.num_pages 1 %}    
+{% if page.has_previous %} 
+<a href="?page={{ page.previous_page_number }}">&laquo; пред. </a>&nbsp;
+{% endif %}
+
+Страница {{current_page}} из {{paginator.num_pages}}
+
+{% if page.has_next %} 
+&nbsp;<a href="?page={{ page.next_page_number }}">след. &raquo;</a>
+{% endif %}
+{% endifnotequal %}
+</div>
+{% endblock %}

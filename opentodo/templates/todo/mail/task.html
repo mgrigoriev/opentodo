@@ -1,0 +1,10 @@
+{% load todo_extras %}Задача: {{t.title}}
+{% if t.info %}{{t.info}}{% endif %}
+
+Проект: {{t.project.title }}
+Автор: {{ t.author|username }}
+Дата: {{t.created_at|date:"d.m.Y"}}
+Ответственный: {{ t.assigned_to|username|default:"не назначен" }}
+{% if t.deadline %}Срок: {{ t.deadline|date:"d.m.Y" }}{% endif %}
+
+http://{{host}}{% url task_details t.id %}

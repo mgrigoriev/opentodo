@@ -1,0 +1,37 @@
+<script type="text/javascript"> 
+$(document).ready(function(){
+	$("#id_title").attr("required", "true");
+	$("#id_deadline").attr("mask", "datemask");
+	
+	$('#editform').formValidation({
+		err_class: "invalidInput",
+		display_alert: false
+	});
+});
+</script> 
+
+<div class="formErrors">
+	{% if form.title.errors %}Не введено название проекта<br />{% endif %}
+</div>
+
+<div class="editformWrapper" style="width:800px">
+<form method="post" id="editform">
+	<div class="fieldWrapper">
+		<label for="id_title"><span class="red">*</span> Проект:</label>
+		{{form.title}}
+	</div>
+	<div class="fieldWrapper">
+		<label for="id_info">Описание:</label>
+		{{form.info}}
+	</div>
+	<div class="fieldWrapper fieldWrapperIndent">
+		<label>&nbsp;</label><input type="submit" value="Сохранить проект" class="button" /><a href="{% if add %}{% url projects_list %}{% else %}{% url project_details project.id %}{% endif %}">отмена</a>
+	</div>
+</form>
+</div>
+
+{% if add %}
+<script language="javascript">
+	document.getElementById('id_title').focus();
+</script>
+{% endif %}

@@ -1,0 +1,50 @@
+{% extends "todo.html" %}
+{% load todo_extras %}
+
+{% block extra_media %}
+{{f.media}}
+{% include "extra_css.html" %}
+{% endblock %}
+
+{% block title %}{{project}}{% endblock %}
+
+{% block left %}
+
+<div>
+<b>Автор</b><br />
+<span>{{project.author|username}}</span>
+</div>
+<div class="top-indent">
+<b>Дата создания</b><br />
+<span>{{project.created_at|format_date:"short"}}</span>
+</div>
+{% ifequal project.author user %}
+	{% include "todo/project_actions.html" %}
+{% else %}
+	{% if perms.todo.change_project %}
+		{% include "todo/project_actions.html" %}
+	{% endif %}
+{% endifequal %}
+
+{% endblock %}
+
+{% block content %}
+<div id="task-container" style="padding-bottom:0">
+<h2 id="task-title">{{project.title}}</h2>
+{% if project.info %}
+<div id="task-info">{{project.info|linebreaksbr}}</div>
+{% endif %}
+
+<div id="task-action">
+<a href="{% url tasks_list %}?project_id={{project.id}}&folder=all" class="bigger">Задачи</a>
+<sup>({{project.tasks_count}}{%if project.tasks_active_count%}, <b>{{project.tasks_active_count}}</b>{% endif %})</sup>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="{% url projects_list %}" class="bigger">Назад к проектам &rarr;</a>
+</div>
+
+</div>
+
+<a name="files"></a>
+{% include "todo/files.html" %}
+
+{% endblock %}
