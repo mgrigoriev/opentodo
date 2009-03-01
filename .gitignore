@@ -1,0 +1,4 @@
+local_settings.py
+Thumbs.db
+opentodo_media/uploads/*
+*.pyc
