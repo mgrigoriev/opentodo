@@ -2,7 +2,7 @@
 
 # ! It is a good idea not to edit this and edit local_settings.py instead
 # ! (copy local_settings.py.default to local_settings.py first)
-# ! Especially if you want to update from Subversion in future, because
+# ! Especially if you want to update from version control system in future, because
 # ! local_settings.py is not under version control
 
 DEBUG = True
