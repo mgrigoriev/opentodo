@@ -7,7 +7,7 @@ from todo.models import *
 class OpentodoModelForm(ModelForm):
     class Media:
         css = { 'all': ('forms.css',) }
-        js = ('jquery-1.2.6.pack.js', 'jquery.formvalidation.1.1.5.js',)
+        js = ('jquery.formvalidation.1.1.5.js',)
 
 # Форма редактирования проекта
 class ProjectFormEdit(OpentodoModelForm):

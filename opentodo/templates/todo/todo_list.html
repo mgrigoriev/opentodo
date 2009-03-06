@@ -27,9 +27,6 @@
 	<div{% ifequal folder 'all' %} class="selected"{% endifequal %}>
 		<a href="{% url tasks_list %}?folder=all">Все</a>
 	</div>
-<!-- 	<div class="indent">
-		<a href="{% url add_task %}" class="action1">Добавить&nbsp;задачу&nbsp;&rarr;</a>
-	</div> -->
 </div>
 
 
@@ -50,11 +47,46 @@
 	{% if project %} по проекту {{project.title}}{% endif %}
 	</h1>
 
-	{% if hide_done %}
-		<a href="{% url tasks_list %}?hide_done=0" class="show-closed">показать завершенные</a>
-	{% else %}
-		<a href="{% url tasks_list %}?hide_done=1" class="hide-closed">скрыть завершенные</a>
-	{% endif %}
+<a href="./#TB_inline?height=230&width=250&inlineId=hiddenModalContent" title="Настройки фильтра" class="thickbox" style="color:#888;text-decoration:none;border-bottom:1px solid #ddd;">применить фильтр...</a>
+<!-- FILTER -->
+<div id="hiddenModalContent" style="display:none;">
+<form method="get" action="http://ya.ru/">
+<div id="thickbox_filter_inner" style="padding:5px">
+
+<div style="padding-bottom: 3px; padding-top: 11px">Автор:</div>
+<select id="id_folder" disabled="disabled">
+	<option value="">Все</option>
+	<option value="1" selected="selected">Михаил Григорьев</option>
+	<option value="2">demo</option>
+</select>
+
+<div style="padding-bottom: 3px; padding-top: 11px">Ответственный:</div>
+<select id="id_folder">
+	<option value="">Все</option>
+	<option value="1">Михаил Григорьев</option>
+	<option value="2">demo</option>
+</select>
+
+<div style="padding-bottom: 3px; padding-top: 11px">Статус задачи:</div>
+<select id="id_folder">
+	<option value="">Все</option>
+	<option value="1">Все активные</option>
+	<option value="2">Все завершенные</option>
+	<option value="2">Новая</option>
+	<option value="2">Принята</option>
+	<option value="2">Завершена</option>
+	<option value="2">Завершена и одобрена</option>
+</select>
+
+<div style="padding-top: 11px">
+<input type="submit" value="  Применить  "  />
+</div>
+
+</div>
+</form>
+</div>
+<!-- /FILTER -->
+
 	</div>
 
 	<div style="float:right; text-align:right; margin-bottom:20px;">
@@ -103,7 +135,6 @@
 {% endblock %}
 
 {% block bottom %}
-
 <div class="pagination">
 {% ifnotequal paginator.num_pages 1 %}    
 {% if page.has_previous %} 
@@ -117,4 +148,8 @@
 {% endif %}
 {% endifnotequal %}
 </div>
+{% endblock %}
+
+{% block extra_body %}
+
 {% endblock %}
