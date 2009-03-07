@@ -73,12 +73,16 @@ def attach(path):
     return os.path.basename(path)
 
 """
-    Преобразование числа байт в килобайты
+    Размер файла в килобайтах
 """
 @register.filter
-def kilobytes(size):
-    import math
-    return "%s" % (int(math.ceil(float(size)/1024)))
+def size_kb(attached_file):
+    try:
+        size = attached_file.size
+        import math
+        return "%s Кб" % (int(math.ceil(float(size)/1024)))
+    except:
+        return u'размер неизвестен'
 
 """
     Имя пользователя: Имя Фамилия (если указаны) или логин

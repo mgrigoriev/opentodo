@@ -8,7 +8,6 @@
 {% block title %}Задачи{% endblock %}
 
 {% block left %}
-
 <div id="filter-wrapper">
 
 <form method="get" id="prjform">
@@ -35,7 +34,6 @@
 {% endblock %}
 
 {% block content %}
-
 <div id="task-list">
 
 <div id="task-list-top">
@@ -47,39 +45,45 @@
 	{% if project %} по проекту {{project.title}}{% endif %}
 	</h1>
 
-<a href="./#TB_inline?height=230&width=250&inlineId=hiddenModalContent" title="Настройки фильтра" class="thickbox" style="color:#888;text-decoration:none;border-bottom:1px solid #ddd;">применить фильтр...</a>
+{% if filter_on %}
+<span id="filter_on">+&nbsp;<a href="./#TB_inline?height=230&width=250&inlineId=hiddenModalContent" title="Настройки фильтра" class="thickbox">фильтр</a><span>
+{% else %}
+<span id="filter_off"><a href="./#TB_inline?height=230&width=250&inlineId=hiddenModalContent" title="Настройки фильтра" class="thickbox">применить фильтр...</a></span>
+{% endif %}
+
 <!-- FILTER -->
 <div id="hiddenModalContent" style="display:none;">
-<form method="get" action="http://ya.ru/">
+<form method="get" action="{% url tasks_list %}">
+<input type="hidden" name="filter" value="on" />
 <div id="thickbox_filter_inner" style="padding:5px">
 
 <div style="padding-bottom: 3px; padding-top: 11px">Автор:</div>
-<select id="id_folder" disabled="disabled">
+<select id="id_folder" name="author"{% ifequal folder 'outbox' %} disabled="disabled"{% endifequal%}>
 	<option value="">Все</option>
-	<option value="1" selected="selected">Михаил Григорьев</option>
-	<option value="2">demo</option>
+{% for author in users %}
+	<option value="{{author.id}}"{% ifequal folder 'outbox' %}{% ifequal author.id user.id %} selected="selected"{% endifequal %}{% else %}{% ifequal author.id params.author %} selected="selected"{% endifequal %}{% endifequal %}>{{author|username}}</option>
+{% endfor %}
 </select>
 
 <div style="padding-bottom: 3px; padding-top: 11px">Ответственный:</div>
-<select id="id_folder">
+<select id="id_folder" name="assigned_to"{% ifequal folder 'inbox' %} disabled="disabled"{% endifequal%}>
 	<option value="">Все</option>
-	<option value="1">Михаил Григорьев</option>
-	<option value="2">demo</option>
+{% for assigned_to in users %}
+	<option value="{{assigned_to.id}}"{% ifequal folder 'inbox' %}{% ifequal assigned_to.id user.id %} selected="selected"{% endifequal %}{% else %}{% ifequal assigned_to.id params.assigned_to %} selected="selected"{% endifequal %}{% endifequal %}>{{assigned_to|username}}</option>
+{% endfor %}
 </select>
 
 <div style="padding-bottom: 3px; padding-top: 11px">Статус задачи:</div>
-<select id="id_folder">
+<select id="id_folder" name="status">
 	<option value="">Все</option>
-	<option value="1">Все активные</option>
-	<option value="2">Все завершенные</option>
-	<option value="2">Новая</option>
-	<option value="2">Принята</option>
-	<option value="2">Завершена</option>
-	<option value="2">Завершена и одобрена</option>
+	<option value="all_active"{% ifequal params.status 'all_active' %} selected="selected"{% endifequal %}>Все активные</option>
+	<option value="all_done"{% ifequal params.status 'all_done' %} selected="selected"{% endifequal %}>Все завершенные</option>
+	{% for status in states %}<option value="{{status.id}}"{% ifequal params.status status.id %} selected="selected"{% endifequal %}>{{status.title}}</option>
+	{% endfor %}
 </select>
 
 <div style="padding-top: 11px">
-<input type="submit" value="  Применить  "  />
+<input type="submit" value="  Применить  "  /> или <a href="{% url tasks_list %}?filter=off" style="color:#3333cc;">сбросить</a>
 </div>
 
 </div>

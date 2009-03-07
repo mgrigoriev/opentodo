@@ -123,8 +123,21 @@ th {
 
 h1#todolist {
 	display: inline;
-	padding-right: 5px
 }
+#filter_on {
+	font-size: 145%;
+}
+#filter_on a, #filter_on a:visited {
+	color: #009900;
+	text-decoration: none;
+	border-bottom: 1px dashed #009900;
+}
+#filter_off a, #filter_off a:visited{
+	color:#888;
+	text-decoration:none;
+	border-bottom:1px solid #ddd;
+}
+
 #filter-wrapper {
 	padding-top: 46px;
 }

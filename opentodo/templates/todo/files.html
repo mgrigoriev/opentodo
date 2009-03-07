@@ -15,16 +15,9 @@ $(document).ready(function(){
 		$("#attach_form").hide();
 		$(".formErrors").hide();
 		$("#add_file_link").show();
-		$("#id_attached_file").removeClass('invalidInput');
 	});
 
 	$("#id_attached_file").attr("required", "true");
-	
-	$('#attach_form').formValidation({
-		err_class: "invalidInput",
-		display_alert: false
-	});
-
 });
 </script>
 
@@ -43,7 +36,7 @@ $(document).ready(function(){
 <div class="attachments">
 
 {% for a in attachments %}
-<a href="{{ a.attached_file.url }}">{{a.attached_file.name|attach}}</a> ({{a.attached_file.size|kilobytes}} Кб) &#151; {{a.author|username}}, {{a.created_at|format_date}}
+<a href="{{ a.attached_file.url }}">{{a.attached_file.name|attach}}</a> ({{a.attached_file|size_kb}}) &#151; {{a.author|username}}, {{a.created_at|format_date}}
 
 {% ifequal a.author user %}
 	{% include "todo/file_actions.html" %}

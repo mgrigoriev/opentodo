@@ -20,10 +20,14 @@ def index(request):
 def list(request, state=0):
     order = direct = ''
     project = None
-
+    filter_on = False
+    
+    users = User.objects.all().order_by('first_name', 'last_name')
     projects = Project.objects.all()
     tasks = Task.objects.all()
+    states = Status.objects.all()
     
+    # Запоминаем в сессии id проекта, если передано в GET
     if request.GET.get('project_id', False):
         try:
             project_id = int(request.GET['project_id'])
@@ -35,17 +39,35 @@ def list(request, state=0):
             except Project.DoesNotExist:
                 raise Http404
         request.session['project_id'] = project_id
+
+    # Запоминаем в сессии группу задач (вх., исх., все) и сортировку, если передано в GET
     if request.GET.get('folder', False):
         request.session['folder'] = request.GET['folder']
     if request.GET.get('order', False):
         request.session['order'] = request.GET['order']
     if request.GET.get('dir', False):
         request.session['dir'] = request.GET['dir']
-    if request.GET.get('hide_done', False):
-        request.session['hide_done'] = request.GET['hide_done']
+
+    # Если настройки фильтра сброшены или изменены, удаляем существующие
+    if request.GET.get('filter', False) in ('on', 'off'):
+        for key in ('author', 'assigned_to', 'status'):
+            try:
+                del request.session[key]
+            except KeyError:
+                pass
+
+    # Запоминаем в сессии параметры доп. фильтра
+    if request.GET.get('filter', False) == 'on':
+        if request.GET.get('author', False):
+            request.session['author'] = request.GET['author']
+        if request.GET.get('assigned_to', False):
+            request.session['assigned_to'] = request.GET['assigned_to']
+        if request.GET.get('status', False):
+            request.session['status'] = request.GET['status']
 
     params = request.session
 
+    # Фильтруем по проекту
     if params.get('project_id', False):
         if params['project_id'] != '0':
             params['project_id'] = int(params['project_id'])
@@ -54,7 +76,8 @@ def list(request, state=0):
                 tasks = tasks.filter(project__id = params['project_id'])
             except Project.DoesNotExist:
                 request.session['project_id'] = '0'
- 
+    
+    # Фильтруем по группе
     if params.get('folder', False):
         folder = params['folder']
         if not (folder == 'inbox' or folder == 'outbox' or folder == 'all'):
@@ -67,13 +90,35 @@ def list(request, state=0):
     elif folder == 'outbox':
         tasks = tasks.filter(author=request.user)
 
-    if params.get('hide_done', False) == '1':
-        hide_done = True
-        tasks = tasks.exclude(status__id=3).exclude(status__id=4)
-    else:
-        hide_done = False
+    
+    # Доп. фильтр:
+    if (params.get('author', False) and not folder == 'outbox') or (params.get('assigned_to', False) and not folder == 'inbox') or params.get('status', False):
+        filter_on = True
+        # Автор
+        if params.get('author', False):
+            try:
+                params['author'] = int(params['author'])
+                tasks = tasks.filter(author__id=params['author'])
+            except ValueError:
+                pass
+        # Ответственный
+        if params.get('assigned_to', False):
+            try:
+                params['assigned_to'] = int(params['assigned_to'])
+                tasks = tasks.filter(assigned_to__id=params['assigned_to'])
+            except ValueError:
+                pass
+        # Статус
+        if params.get('status', False):
+            if params['status'] in ('1','2','3','4'):
+                params['status'] = int(params['status'])
+                tasks = tasks.filter(status__id=params['status'])
+            elif params['status'] == 'all_active':
+                tasks = tasks.exclude(status__id=3).exclude(status__id=4)
+            elif params['status'] == 'all_done':
+                tasks = tasks.exclude(status__id=1).exclude(status__id=2)
 
-
+    # Сортировка:
     if params.get('order', False):
         order = params['order']
     else:
@@ -122,12 +167,13 @@ def list(request, state=0):
         order = 'created_at'
         direct = 'desc'
         tasks = tasks.order_by('-created_at')
-
+    
+    # Разбиение на страницы
     paginator = Paginator(tasks, 100)
     page_num = int(request.GET.get('page', '1'))
     page = paginator.page(page_num)
 
-    return render_to_response('todo/todo_list.html', {'tasks':page.object_list, 'page':page, 'paginator':paginator, 'current_page':page_num, 'projects':projects, 'project':project, 'query':params, 'folder':folder, 'order':order, 'dir':direct, 'hide_done':hide_done, 'menu_active':'tasks' }, context_instance=RequestContext(request))
+    return render_to_response('todo/todo_list.html', {'tasks':page.object_list, 'page':page, 'paginator':paginator, 'current_page':page_num, 'projects':projects, 'project':project, 'params':params, 'folder':folder, 'order':order, 'dir':direct, 'menu_active':'tasks', 'users':users, 'states':states, 'filter_on':filter_on }, context_instance=RequestContext(request))
 
 # Информация о задаче + загрузка файлов
 @login_required
