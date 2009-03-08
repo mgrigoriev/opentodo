@@ -124,18 +124,18 @@ th {
 h1#todolist {
 	display: inline;
 }
-#filter_on {
+.filter_on {
 	font-size: 145%;
 }
-#filter_on a, #filter_on a:visited {
-	color: #009900;
+a.filter_on, a.filter_on:visited {
 	text-decoration: none;
+	color: #009900;
 	border-bottom: 1px dashed #009900;
 }
-#filter_off a, #filter_off a:visited{
+a.filter_off, a.filter_off:visited{
 	color:#888;
 	text-decoration:none;
-	border-bottom:1px solid #ddd;
+	border-bottom: 1px solid #ddd;
 }
 
 #filter-wrapper {
@@ -226,10 +226,6 @@ div.status1 {
 div.status2 {
 	background-color: #ffe376;
 	color: #912402;
-/*
-	background-color: #b1d2fd;
-	color: #11407b;
-*/
 }
 div.status3 {
 	background-color: #bcf187;
@@ -239,20 +235,6 @@ div.status4 {
 	background-color: #ddd;
 	color: #777;
 }
-/*
-div.status1 {
-	background-color: #f2bf28;
-}
-div.status2 {
-	background-color: #318ac8;
-}
-div.status3 {
-	background-color: #7aca12;
-}
-div.status4 {
-	background-color: #aaadaf;
-}
-*/
 
 tr.grey td {
 	background-color: #f5f5f5;
