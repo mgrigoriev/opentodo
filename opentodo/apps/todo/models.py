@@ -33,12 +33,13 @@ def make_upload_path(instance, filename):
         project_id = instance.task.project.id
         return u"%s/%s/tasks/%s" % (upload_path, project_id, filename)    
 
-# Проекты (группы задач)
+# Проекты
 class Project(models.Model):
     title = models.CharField("Проект", max_length=255)
     info = models.TextField("Описание", null=True, blank=True)
     created_at = models.DateTimeField("Дата добавления", auto_now_add=True)
     author = models.ForeignKey(User, null=True, db_column='author', related_name="projects", verbose_name="Автор")
+    users = models.ManyToManyField(User, verbose_name="Команда", related_name="avail_projects")
     def __unicode__(self):
         return self.title
     def _get_tasks_count(self):
@@ -47,6 +48,17 @@ class Project(models.Model):
         return self.related_tasks.exclude(status=3).exclude(status=4).count()
     tasks_count = property(_get_tasks_count)
     tasks_active_count = property(_get_tasks_count_active)
+
+    # При добавлении проекта добавляем автора в команду
+    def save(self):
+        is_new = self._get_pk_val() is None
+        super(Project, self).save()
+        if is_new:
+            self.users.add(self.author)
+
+    class Meta:
+        verbose_name = "проект"
+        verbose_name_plural = "проекты"
 
 # Статусы задач
 class Status(models.Model):

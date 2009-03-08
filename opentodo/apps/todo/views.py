@@ -10,6 +10,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, InvalidPage
 from todo.models import *
 from todo.forms import *
+from django.db.models import Q
 
 @login_required
 def index(request):
@@ -22,9 +23,15 @@ def list(request, state=0):
     project = None
     filter_on = False
     
-    users = User.objects.all().order_by('first_name', 'last_name')
-    projects = Project.objects.all()
-    tasks = Task.objects.all()
+    # Текущий пользователь
+    user = request.user
+
+    # Получаем проекты и задачи, к которым есть доступ
+    projects = user.avail_projects.all()
+    tasks = Task.objects.filter(project__in=projects)
+    
+    # Пользователи и статусы задач - для фильтра
+    users = User.objects.filter(avail_projects__in=projects).distinct().order_by('first_name', 'last_name')
     states = Status.objects.all()
     
     # Запоминаем в сессии id проекта, если передано в GET
@@ -356,7 +363,6 @@ def delete_task_attach(request, attach_id):
     attach.delete()
     return HttpResponseRedirect(reverse('task_details', args=(attach.task.id,)))
 
-
 # Добавить проект
 @login_required
 def add_project(request):
@@ -515,7 +521,6 @@ def add_comment(request, task_id):
         c.mail_notify(request.get_host())
 
     return HttpResponseRedirect(reverse('task_details', args=(task_id,)))
-
 
 # Удалить комментарий к задаче
 @login_required
