@@ -1,1 +1,9 @@
-404 Page not found
+{% extends "todo.html" %}
+
+{% block title %}404{% endblock %}
+
+{% block content %}
+<h1>Объект не найден (404)</h1><br /> 
+Возможно, он был удален или перемещен.<br />
+<a href="{% url tasks_list %}">вернуться на заглавную страницу</a>
+{% endblock %}

@@ -2,10 +2,10 @@
 
 from django.conf import settings
 from django.shortcuts import render_to_response
-from django.http import HttpResponse, HttpResponseRedirect, Http404, HttpRequest
+from django.http import HttpResponse, HttpResponseRedirect, Http404, HttpRequest, HttpResponseForbidden
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
-from django.template import RequestContext
+from django.template import RequestContext, loader
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, InvalidPage
 from todo.models import *
@@ -17,17 +17,15 @@ def index(request):
     return HttpResponseRedirect(reverse('tasks_list'))
 
 # Список задач
+# access control +
 @login_required
 def list(request, state=0):
     order = direct = ''
     project = None
     filter_on = False
     
-    # Текущий пользователь
-    user = request.user
-
     # Получаем проекты и задачи, к которым есть доступ
-    projects = user.avail_projects.all()
+    projects = request.user.avail_projects.all()
     tasks = Task.objects.filter(project__in=projects)
     
     # Пользователи и статусы задач - для фильтра
@@ -80,7 +78,11 @@ def list(request, state=0):
             params['project_id'] = int(params['project_id'])
             try:
                 project = Project.objects.get(pk=params['project_id'])
-                tasks = tasks.filter(project__id = params['project_id'])
+                if not project.is_avail(request.user):
+                    request.session['project_id'] = '0'
+                    return HttpResponseRedirect(reverse('tasks_list'))
+                else:
+                    tasks = tasks.filter(project__id = params['project_id'])
             except Project.DoesNotExist:
                 request.session['project_id'] = '0'
     
@@ -183,12 +185,16 @@ def list(request, state=0):
     return render_to_response('todo/todo_list.html', {'tasks':page.object_list, 'page':page, 'paginator':paginator, 'current_page':page_num, 'projects':projects, 'project':project, 'params':params, 'folder':folder, 'order':order, 'dir':direct, 'menu_active':'tasks', 'users':users, 'states':states, 'filter_on':filter_on }, context_instance=RequestContext(request))
 
 # Информация о задаче + загрузка файлов
+# access control +
 @login_required
 def details(request, task_id):
     try:
         task = Task.objects.get(pk=task_id)
     except Task.DoesNotExist:
         raise Http404
+
+    if not task.project.is_avail(request.user):
+        return HttpResponseForbidden()
 
     # Список файлов
     attachments = TaskAttach.objects.filter(task=task).order_by('-id')
@@ -209,6 +215,7 @@ def details(request, task_id):
     return render_to_response('todo/task_details.html', {'task': task, 'menu_active':'tasks', 'attachments':attachments, 'f':f }, context_instance=RequestContext(request))
 
 # Редактировать задачу
+# access control +
 @login_required
 def edit(request, task_id):
     try:
@@ -216,13 +223,16 @@ def edit(request, task_id):
     except Task.DoesNotExist:
         raise Http404
 
+    if not task.project.is_avail(request.user):
+        return HttpResponseForbidden()
+
     try:
         author = task.author
     except User.DoesNotExist:
         author = None
 
     if not (request.user.has_perm('todo.change_task') or request.user == author):
-        return HttpResponse("Недостаточно прав для выполнения действия.")
+        return HttpResponseForbidden()
 
     if request.method == 'POST':
         f = TaskFormEdit(request.POST, instance = task)
@@ -277,6 +287,7 @@ def add_task(request):
     return render_to_response('todo/task_edit.html', {'form': f, 'add': True, 'users': users, 'menu_active':'tasks' }, context_instance=RequestContext(request))
 
 # Удалить задачу
+# access control +
 @login_required
 def delete(request, task_id):
     try:
@@ -284,31 +295,38 @@ def delete(request, task_id):
     except Task.DoesNotExist:
         raise Http404
 
+    if not task.project.is_avail(request.user):
+        return HttpResponseForbidden()
+
     try:
         author = task.author
     except User.DoesNotExist:
         author = None
 
     if not (request.user.has_perm('todo.delete_task') or request.user == author):
-        return HttpResponse("Недостаточно прав для выполнения действия.")
+        return HttpResponseForbidden()
 
     task.delete()
     return HttpResponseRedirect(reverse('tasks_list'))
 
 # Список проектов
+# access control +
 @login_required
 def projects_list(request, state=0):
-    projects = Project.objects.all().order_by('title')
-
+    projects = request.user.avail_projects.order_by('title')
     return render_to_response('todo/projects_list.html', {'projects': projects, 'menu_active':'projects' }, context_instance=RequestContext(request))
 
 # Информация о проекте + загрузка файлов
+# access control +
 @login_required
 def project_details(request, project_id):
     try:
         project = Project.objects.get(pk=project_id)
     except Project.DoesNotExist:
         raise Http404
+
+    if not project.is_avail(request.user):
+        return HttpResponseForbidden()
 
     # Список файлов
     attachments = ProjectAttach.objects.filter(project=project).order_by('-id')
@@ -327,6 +345,7 @@ def project_details(request, project_id):
     return render_to_response('todo/project_details.html', {'project':project, 'menu_active':'projects', 'attachments':attachments, 'f':f }, context_instance=RequestContext(request))
 
 # Удалить файл, прикрепленный к проекту
+# access control +
 @login_required
 def delete_project_attach(request, attach_id):
     try:
@@ -338,14 +357,18 @@ def delete_project_attach(request, attach_id):
     except User.DoesNotExist:
         author = None
 
+    if not attach.project.is_avail(request.user):
+        return HttpResponseForbidden()
+
     if not (request.user.has_perm('todo.delete_projectattach') or request.user == author):
-        return HttpResponse("Недостаточно прав для выполнения действия.")
+        return HttpResponseForbidden()
 
     attach.delete()
     return HttpResponseRedirect(reverse('project_details', args=(attach.project.id,)))
     
 
 # Удалить файл, прикрепленный к задаче
+# access control +
 @login_required
 def delete_task_attach(request, attach_id):
     try:
@@ -357,8 +380,11 @@ def delete_task_attach(request, attach_id):
     except User.DoesNotExist:
         author = None
 
+    if not attach.task.project.is_avail(request.user):
+        return HttpResponseForbidden()
+
     if not (request.user.has_perm('todo.delete_taskattach') or request.user == author):
-        return HttpResponse("Недостаточно прав для выполнения действия.")
+        return HttpResponseForbidden()
 
     attach.delete()
     return HttpResponseRedirect(reverse('task_details', args=(attach.task.id,)))
@@ -379,6 +405,7 @@ def add_project(request):
     return render_to_response('todo/project_edit.html', {'form': f, 'add': True, 'menu_active':'projects' }, context_instance=RequestContext(request))
 
 # Редактировать проект
+# access control +
 @login_required
 def edit_project(request, project_id):
     try:
@@ -391,8 +418,11 @@ def edit_project(request, project_id):
     except User.DoesNotExist:
         author = None
 
+    if not project.is_avail(request.user):
+        return HttpResponseForbidden()
+
     if not (request.user.has_perm('todo.change_project') or request.user == author):
-        return HttpResponse("Недостаточно прав для выполнения действия.")
+        return HttpResponseForbidden()
 
     if request.method == 'POST':
         f = ProjectFormEdit(request.POST, instance = project)
@@ -406,12 +436,19 @@ def edit_project(request, project_id):
     return render_to_response('todo/project_edit.html', {'form': f, 'project': project, 'menu_active':'projects' }, context_instance=RequestContext(request))
 
 # Удалить проект
+# access control +
 @login_required
 def delete_project(request, project_id):
     try:
         project = Project.objects.get(pk=project_id)
     except Project.DoesNotExist:
         raise Http404
+
+    if not project.is_avail(request.user):
+        return HttpResponseForbidden()
+
+    if not (request.user.has_perm('todo.delete_project') or request.user == author):
+        return HttpResponseForbidden()
 
     if project.tasks_count > 0:
         return render_to_response('todo/project_delete_cannot.html', {'project': project, 'menu_active':'projects' }, context_instance=RequestContext(request))
@@ -434,7 +471,7 @@ def task_to_accepted(request, task_id):
         assigned_to = None
 
     if not request.user == assigned_to:
-        return HttpResponse("Недостаточно прав для выполнения действия.")
+        return HttpResponseForbidden()
 
     task.status = Status.objects.get(pk=2)
     task.save()
@@ -456,7 +493,7 @@ def task_to_done(request, task_id):
         assigned_to = None
 
     if not request.user == assigned_to:
-        return HttpResponse("Недостаточно прав для выполнения действия.")
+        return HttpResponseForbidden()
 
     task.status = Status.objects.get(pk=3)
     task.save()
@@ -478,7 +515,7 @@ def task_to_checked(request, task_id):
         author = None
 
     if not request.user == author:
-        return HttpResponse("Недостаточно прав для выполнения действия.")
+        return HttpResponseForbidden()
 
     task.status = Status.objects.get(pk=4)
     task.save()
@@ -500,7 +537,7 @@ def task_to_new(request, task_id):
         author = None
 
     if not request.user == author:
-        return HttpResponse("Недостаточно прав для выполнения действия.")
+        return HttpResponseForbidden()
 
     task.status = Status.objects.get(pk=1)
     task.save()
@@ -508,6 +545,7 @@ def task_to_new(request, task_id):
     return HttpResponseRedirect(reverse('task_details', args=(task_id,)))
 
 # Добавить комментарий к задаче
+# access control +
 @login_required
 def add_comment(request, task_id):    
     if request.method == 'POST' and request.POST.get('message', '') != '':
@@ -515,6 +553,10 @@ def add_comment(request, task_id):
             t = Task.objects.get(pk=task_id)
         except Task.DoesNotExist:
             raise Http404
+
+        if not t.project.is_avail(request.user):
+            return HttpResponseForbidden()
+
         m = request.POST.get('message', '')
         c = Comment(author=request.user, task=t, message=m)
         c.save()
@@ -533,7 +575,17 @@ def del_comment(request, comment_id):
         author = comment.author
     except User.DoesNotExist:
         author = None
+
+    if not comment.task.project.is_avail(request.user):
+        return HttpResponseForbidden()
+
     if not (request.user.has_perm('todo.delete_comment') or request.user == author):
-        return HttpResponse("Недостаточно прав для выполнения действия.")
+        return HttpResponseForbidden()
     comment.delete()
     return HttpResponseRedirect(reverse('task_details', args=(comment.task.id,)))
+
+# 403 Forbidden
+@login_required
+def forbidden(request, template_name='403.html'):
+    t = loader.get_template(template_name)
+    return HttpResponseForbidden(t.render(RequestContext(request)))

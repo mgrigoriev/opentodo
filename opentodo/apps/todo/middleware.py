@@ -15,3 +15,12 @@ class StripWhitespaceMiddleware:
             return response
         else:
             return response
+
+from django.http import HttpResponseForbidden
+from todo.views import forbidden
+class Custom403Middleware(object):
+      def process_response(self, request, response):
+          if isinstance(response, HttpResponseForbidden):
+             return forbidden(request)
+          else:
+             return response

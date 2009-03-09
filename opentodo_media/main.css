@@ -59,7 +59,7 @@ body, th, td {
 h1 {
 	font: normal 145% Arial, Helvetica, sans-serif;
 	color: #000;
-	padding: 0 0 0 0;
+	padding: 0 0 15px 0;
 }
 .bigger {
 	font-size: 11pt;
@@ -274,12 +274,13 @@ div.top-indent {
 	line-height: 1.4em;
 }
 #comment-container {
+	padding-top: 0px;
 	padding-bottom: 0px;
 	font-size:11pt;
 	line-height: 1.4em;
 }
 div.comment {
-	padding-top: 5px;
+	padding-top: 0px;
 	margin-bottom:12px;
 	width: 50em;
 	color: #000;

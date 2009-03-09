@@ -49,6 +49,14 @@ class Project(models.Model):
     tasks_count = property(_get_tasks_count)
     tasks_active_count = property(_get_tasks_count_active)
 
+    # Проект доступен для пользователя
+    def is_avail(self, user):
+        try:
+            user.avail_projects.get(pk=self.pk)
+            return True
+        except Project.DoesNotExist:
+            return False
+
     # При добавлении проекта добавляем автора в команду
     def save(self):
         is_new = self._get_pk_val() is None
