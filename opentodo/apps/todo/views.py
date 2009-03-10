@@ -3,6 +3,7 @@
 from django.conf import settings
 from django.shortcuts import render_to_response
 from django.http import HttpResponse, HttpResponseRedirect, Http404, HttpRequest, HttpResponseForbidden
+from django.shortcuts import get_object_or_404
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.template import RequestContext, loader
@@ -10,7 +11,6 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, InvalidPage
 from todo.models import *
 from todo.forms import *
-from django.db.models import Q
 
 @login_required
 def index(request):
@@ -39,10 +39,7 @@ def list(request, state=0):
         except:
             raise Http404
         if project_id != 0:
-            try:
-                project = Project.objects.get(pk=project_id)
-            except Project.DoesNotExist:
-                raise Http404
+            project = get_object_or_404(Project, pk=project_id)
         request.session['project_id'] = project_id
 
     # Запоминаем в сессии группу задач (вх., исх., все) и сортировку, если передано в GET
@@ -187,10 +184,7 @@ def list(request, state=0):
 # access control +
 @login_required
 def details(request, task_id):
-    try:
-        task = Task.objects.get(pk=task_id)
-    except Task.DoesNotExist:
-        raise Http404
+    task = get_object_or_404(Task, pk=task_id)
 
     if not task.project.is_avail(request.user):
         return HttpResponseForbidden()
@@ -217,10 +211,7 @@ def details(request, task_id):
 # access control +
 @login_required
 def edit(request, task_id):
-    try:
-        task = Task.objects.get(pk=task_id)
-    except Task.DoesNotExist:
-        raise Http404
+    task = get_object_or_404(Task, pk=task_id)
 
     if not task.project.is_avail(request.user):
         return HttpResponseForbidden()
@@ -291,10 +282,7 @@ def add_task(request):
 # access control +
 @login_required
 def delete(request, task_id):
-    try:
-        task = Task.objects.get(pk=task_id)
-    except Task.DoesNotExist:
-        raise Http404
+    task = get_object_or_404(Task, pk=task_id)
 
     if not task.project.is_avail(request.user):
         return HttpResponseForbidden()
@@ -321,10 +309,7 @@ def projects_list(request, state=0):
 # access control +
 @login_required
 def project_details(request, project_id):
-    try:
-        project = Project.objects.get(pk=project_id)
-    except Project.DoesNotExist:
-        raise Http404
+    project = get_object_or_404(Project, pk=project_id)
 
     if not project.is_avail(request.user):
         return HttpResponseForbidden()
@@ -349,10 +334,8 @@ def project_details(request, project_id):
 # access control +
 @login_required
 def delete_project_attach(request, attach_id):
-    try:
-        attach = ProjectAttach.objects.get(pk=attach_id)
-    except ProjectAttach.DoesNotExist:
-        raise Http404
+    attach = get_object_or_404(ProjectAttach, pk=attach_id)
+
     try:
         author = attach.author
     except User.DoesNotExist:
@@ -372,10 +355,8 @@ def delete_project_attach(request, attach_id):
 # access control +
 @login_required
 def delete_task_attach(request, attach_id):
-    try:
-        attach = TaskAttach.objects.get(pk=attach_id)
-    except TaskAttach.DoesNotExist:
-        raise Http404
+    attach = get_object_or_404(TaskAttach, pk=attach_id)
+
     try:
         author = attach.author
     except User.DoesNotExist:
@@ -415,10 +396,7 @@ def add_project(request):
 # access control +
 @login_required
 def edit_project(request, project_id):
-    try:
-        project = Project.objects.get(pk=project_id)
-    except Task.DoesNotExist:
-        raise Http404
+    project = get_object_or_404(Project, pk=project_id)
 
     if not request.user.is_superuser:
         return HttpResponseForbidden()
@@ -441,10 +419,7 @@ def edit_project(request, project_id):
 # access control +
 @login_required
 def delete_project(request, project_id):
-    try:
-        project = Project.objects.get(pk=project_id)
-    except Project.DoesNotExist:
-        raise Http404
+    project = get_object_or_404(Project, pk=project_id)
 
     if not project.is_avail(request.user):
         return HttpResponseForbidden()
@@ -463,15 +438,11 @@ def delete_project(request, project_id):
         project.delete()
         return HttpResponseRedirect(reverse('projects_list'))
         
-
 # Принять задачу
 # Имеет право: assigned_to (тот, кому назначена задача)
 @login_required
 def task_to_accepted(request, task_id):
-    try:
-        task = Task.objects.get(pk=task_id)
-    except Task.DoesNotExist:
-        raise Http404
+    task = get_object_or_404(Task, pk=task_id)
     try:
         assigned_to = task.assigned_to
     except User.DoesNotExist:
@@ -490,10 +461,7 @@ def task_to_accepted(request, task_id):
 # Имеет право: assigned_to (тот, кому назначена задача)
 @login_required
 def task_to_done(request, task_id):
-    try:
-        task = Task.objects.get(pk=task_id)
-    except Task.DoesNotExist:
-        raise Http404
+    task = get_object_or_404(Task, pk=task_id)
     try:
         assigned_to = task.assigned_to
     except User.DoesNotExist:
@@ -512,10 +480,7 @@ def task_to_done(request, task_id):
 # Имеет право: author (тот, кто назначил)
 @login_required
 def task_to_checked(request, task_id):
-    try:
-        task = Task.objects.get(pk=task_id)
-    except Task.DoesNotExist:
-        raise Http404
+    task = get_object_or_404(Task, pk=task_id)
     try:
         author = task.author
     except User.DoesNotExist:
@@ -534,10 +499,7 @@ def task_to_checked(request, task_id):
 # Имеет право: author (тот, кто назначил)
 @login_required
 def task_to_new(request, task_id):
-    try:
-        task = Task.objects.get(pk=task_id)
-    except Task.DoesNotExist:
-        raise Http404
+    task = get_object_or_404(Task, pk=task_id)
     try:
         author = task.author
     except User.DoesNotExist:
@@ -556,28 +518,22 @@ def task_to_new(request, task_id):
 @login_required
 def add_comment(request, task_id):    
     if request.method == 'POST' and request.POST.get('message', '') != '':
-        try:
-            t = Task.objects.get(pk=task_id)
-        except Task.DoesNotExist:
-            raise Http404
+        task = get_object_or_404(Task, pk=task_id)
 
-        if not t.project.is_avail(request.user):
+        if not task.project.is_avail(request.user):
             return HttpResponseForbidden()
 
-        m = request.POST.get('message', '')
-        c = Comment(author=request.user, task=t, message=m)
-        c.save()
-        c.mail_notify(request.get_host())
+        message = request.POST.get('message', '')
+        comment = Comment(author=request.user, task=task, message=message)
+        comment.save()
+        comment.mail_notify(request.get_host())
 
     return HttpResponseRedirect(reverse('task_details', args=(task_id,)))
 
 # Удалить комментарий к задаче
 @login_required
 def del_comment(request, comment_id):
-    try:
-        comment = Comment.objects.get(pk=comment_id)
-    except Comment.DoesNotExist:
-        raise Http404
+    comment = get_object_or_404(Comment, pk=comment_id)
     try:
         author = comment.author
     except User.DoesNotExist:
@@ -596,10 +552,7 @@ def del_comment(request, comment_id):
 def json_project_users(request):
     if request.GET.get('id', '') != '':
         project_id = request.GET['id']
-        try:
-            project = Project.objects.get(pk=project_id)
-        except Project.DoesNotExist:
-            raise Http404
+        project = get_object_or_404(Project, pk=project_id)
         if not project.is_avail(request.user):
             return HttpResponseForbidden()
         users = project.users.order_by('first_name', 'last_name')
