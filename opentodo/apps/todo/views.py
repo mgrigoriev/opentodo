@@ -4,6 +4,7 @@ from django.conf import settings
 from django.shortcuts import render_to_response
 from django.http import HttpResponse, HttpResponseRedirect, Http404, HttpRequest, HttpResponseForbidden
 from django.shortcuts import get_object_or_404
+from annoying.functions import get_object_or_None
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.template import RequestContext, loader
@@ -216,11 +217,7 @@ def edit(request, task_id):
     if not task.project.is_avail(request.user):
         return HttpResponseForbidden()
 
-    try:
-        author = task.author
-    except User.DoesNotExist:
-        author = None
-
+    author = get_object_or_None(User, id=task.author_id)
     if not (request.user.has_perm('todo.change_task') or request.user == author):
         return HttpResponseForbidden()
 
@@ -287,11 +284,7 @@ def delete(request, task_id):
     if not task.project.is_avail(request.user):
         return HttpResponseForbidden()
 
-    try:
-        author = task.author
-    except User.DoesNotExist:
-        author = None
-
+    author = get_object_or_None(User, id=task.author_id)
     if not (request.user.has_perm('todo.delete_task') or request.user == author):
         return HttpResponseForbidden()
 
@@ -336,14 +329,10 @@ def project_details(request, project_id):
 def delete_project_attach(request, attach_id):
     attach = get_object_or_404(ProjectAttach, pk=attach_id)
 
-    try:
-        author = attach.author
-    except User.DoesNotExist:
-        author = None
-
     if not attach.project.is_avail(request.user):
         return HttpResponseForbidden()
 
+    author = get_object_or_None(User, id=attach.author_id)
     if not (request.user.has_perm('todo.delete_projectattach') or request.user == author):
         return HttpResponseForbidden()
 
@@ -357,14 +346,10 @@ def delete_project_attach(request, attach_id):
 def delete_task_attach(request, attach_id):
     attach = get_object_or_404(TaskAttach, pk=attach_id)
 
-    try:
-        author = attach.author
-    except User.DoesNotExist:
-        author = None
-
     if not attach.task.project.is_avail(request.user):
         return HttpResponseForbidden()
 
+    author = get_object_or_None(User, id=attach.author_id)
     if not (request.user.has_perm('todo.delete_taskattach') or request.user == author):
         return HttpResponseForbidden()
 
@@ -424,11 +409,7 @@ def delete_project(request, project_id):
     if not project.is_avail(request.user):
         return HttpResponseForbidden()
 
-    try:
-        author = project.author
-    except User.DoesNotExist:
-        author = None
-
+    author = get_object_or_None(User, id=project.author_id)
     if not (request.user.has_perm('todo.delete_project') or request.user == author):
         return HttpResponseForbidden()
 
@@ -443,11 +424,8 @@ def delete_project(request, project_id):
 @login_required
 def task_to_accepted(request, task_id):
     task = get_object_or_404(Task, pk=task_id)
-    try:
-        assigned_to = task.assigned_to
-    except User.DoesNotExist:
-        assigned_to = None
 
+    assigned_to = get_object_or_None(User, id=task.assigned_to_id)
     if not request.user == assigned_to:
         return HttpResponseForbidden()
 
@@ -462,11 +440,8 @@ def task_to_accepted(request, task_id):
 @login_required
 def task_to_done(request, task_id):
     task = get_object_or_404(Task, pk=task_id)
-    try:
-        assigned_to = task.assigned_to
-    except User.DoesNotExist:
-        assigned_to = None
 
+    assigned_to = get_object_or_None(User, id=task.assigned_to_id)
     if not request.user == assigned_to:
         return HttpResponseForbidden()
 
@@ -481,11 +456,8 @@ def task_to_done(request, task_id):
 @login_required
 def task_to_checked(request, task_id):
     task = get_object_or_404(Task, pk=task_id)
-    try:
-        author = task.author
-    except User.DoesNotExist:
-        author = None
 
+    author = get_object_or_None(User, id=task.author_id)
     if not request.user == author:
         return HttpResponseForbidden()
 
@@ -500,11 +472,8 @@ def task_to_checked(request, task_id):
 @login_required
 def task_to_new(request, task_id):
     task = get_object_or_404(Task, pk=task_id)
-    try:
-        author = task.author
-    except User.DoesNotExist:
-        author = None
 
+    author = get_object_or_None(User, id=task.author_id)
     if not request.user == author:
         return HttpResponseForbidden()
 
@@ -534,11 +503,8 @@ def add_comment(request, task_id):
 @login_required
 def del_comment(request, comment_id):
     comment = get_object_or_404(Comment, pk=comment_id)
-    try:
-        author = comment.author
-    except User.DoesNotExist:
-        author = None
-
+ 
+    author = get_object_or_None(User, id=comment.author_id)
     if not comment.task.project.is_avail(request.user):
         return HttpResponseForbidden()
 
