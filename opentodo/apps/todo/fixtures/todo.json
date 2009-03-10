@@ -3,14 +3,18 @@
         "pk": 1, 
         "model": "todo.project", 
         "fields": {
-            "title": "Project 1"
+            "title": "Project 1",
+	    "author": 1,
+	    "users": [1]
         }
     },
     {
         "pk": 2, 
         "model": "todo.project", 
         "fields": {
-            "title": "Project 2"
+            "title": "Project 2",
+	    "author": 1,
+	    "users": [1]
         }
     },
     {

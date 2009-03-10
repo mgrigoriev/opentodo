@@ -1,0 +1,7 @@
+{% load todo_extras %}
+[
+{optionValue:'', optionDisplay: '---------'},
+{% for user in users %}
+{optionValue:{{user.id}}, optionDisplay: '{{user|username}}'}{% if not forloop.last %}, {% endif %}
+{% endfor %}
+]

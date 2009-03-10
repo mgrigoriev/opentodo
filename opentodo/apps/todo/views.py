@@ -235,7 +235,7 @@ def edit(request, task_id):
         return HttpResponseForbidden()
 
     if request.method == 'POST':
-        f = TaskFormEdit(request.POST, instance = task)
+        f = TaskFormEdit(request.user, request.POST, instance = task)
         if f.is_valid():
             t = f.save(commit = False)
             if t.deadline:
@@ -251,9 +251,10 @@ def edit(request, task_id):
             t.save()
             return HttpResponseRedirect(reverse('task_details', args=(task_id,)))
     else:
-        f = TaskFormEdit(instance = task)
+        f = TaskFormEdit(request.user, instance = task)
     
-    users = User.objects.all().order_by('first_name', 'last_name')
+    projects = request.user.avail_projects.all()    
+    users = User.objects.filter(avail_projects__in=projects).distinct().order_by('first_name', 'last_name')
 
     return render_to_response('todo/task_edit.html', {'form': f, 'task': task, 'users': users, 'menu_active':'tasks' }, context_instance=RequestContext(request))
 
@@ -261,7 +262,7 @@ def edit(request, task_id):
 @login_required
 def add_task(request):
     if request.method == 'POST':
-        f = TaskFormEdit(request.POST)
+        f = TaskFormEdit(request.user, request.POST)
         if f.is_valid():
             t = f.save(commit = False)
             if t.deadline:
@@ -280,9 +281,10 @@ def add_task(request):
         init_data = {
             'project': request.session.get('project_id',''),
         }
-        f = TaskFormEdit(initial=init_data)
+        f = TaskFormEdit(request.user, initial=init_data)
     
-    users = User.objects.all().order_by('first_name', 'last_name')
+    projects = request.user.avail_projects.all()    
+    users = User.objects.filter(avail_projects__in=projects).distinct().order_by('first_name', 'last_name')
 
     return render_to_response('todo/task_edit.html', {'form': f, 'add': True, 'users': users, 'menu_active':'tasks' }, context_instance=RequestContext(request))
 
@@ -447,6 +449,11 @@ def delete_project(request, project_id):
     if not project.is_avail(request.user):
         return HttpResponseForbidden()
 
+    try:
+        author = project.author
+    except User.DoesNotExist:
+        author = None
+
     if not (request.user.has_perm('todo.delete_project') or request.user == author):
         return HttpResponseForbidden()
 
@@ -583,6 +590,24 @@ def del_comment(request, comment_id):
         return HttpResponseForbidden()
     comment.delete()
     return HttpResponseRedirect(reverse('task_details', args=(comment.task.id,)))
+
+# Список пользователей, имеющих доступ к проекту, в формате JSON (для формы задачи)
+@login_required
+def json_project_users(request):
+    if request.GET.get('id', '') != '':
+        project_id = request.GET['id']
+        try:
+            project = Project.objects.get(pk=project_id)
+        except Project.DoesNotExist:
+            raise Http404
+        if not project.is_avail(request.user):
+            return HttpResponseForbidden()
+        users = project.users.order_by('first_name', 'last_name')
+    else:
+        projects = request.user.avail_projects.all()
+        users = User.objects.filter(avail_projects__in=projects).distinct().order_by('first_name', 'last_name')        
+    return render_to_response('todo/json_project_users.html', {'users': users}, context_instance=RequestContext(request))
+
 
 # 403 Forbidden
 @login_required

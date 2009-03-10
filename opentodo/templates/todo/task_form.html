@@ -1,6 +1,8 @@
 {% load todo_extras %}
 <script type="text/javascript"> 
 $(document).ready(function(){
+	load_users();
+
 	$('#id_deadline').attachDatepicker({showOn:'both', buttonImage:'{{MEDIA_URL}}/img/calendar.gif', buttonImageOnly:true});
 
 	$("#id_project").attr("required", "true");
@@ -12,8 +14,33 @@ $(document).ready(function(){
 		display_alert: false,
 		datemask : /[0-9]{4}-[0-9]{2}-[0-9]{2}/
 	});
+
+	$("select#id_project").change(function(){
+		load_users();
+	});
 });
-</script> 
+
+function load_users() {
+	$.getJSON("{% url json_project_users %}",{id: $('#id_project :selected').val(), ajax: 'true'}, function(j){
+		$("#loader").show();
+//		$('#id_assigned_to').attr("disabled", true); 
+
+		selected_id = {% if add %}{{user.id}}{% else %}{{task.assigned_to.id}}{% endif %}
+
+		var options = '';
+		for (var i = 0; i < j.length; i++) {
+			options += '<option value="' + j[i].optionValue + '"';
+			if (j[i].optionValue == selected_id) {
+				options += ' selected="selected"';
+			}
+			options += '>' + j[i].optionDisplay + '</option>';
+		}
+		$("select#id_assigned_to").html(options);
+		setTimeout(function() { $("#loader").hide(); }, 300);
+//		setTimeout(function() { $("#loader").hide(); $('#id_assigned_to').removeAttr("disabled"); }, 300);
+	})
+}
+</script>
 
 <div class="formErrors">
 	{% if form.project.errors %}Не выбран проект<br />{% endif %}
@@ -47,7 +74,7 @@ $(document).ready(function(){
 	{% for u in users %}
 		<option value="{{u.id}}"{% if add %}{% ifequal u.id user.id %} selected="selected"{% endifequal %}{% else %}{% ifequal u.id task.assigned_to.id %} selected="selected"{% endifequal %}{% endif %}>{{u|username}}</option> 
 	{% endfor %}
-		</select>
+		</select><img src="{{MEDIA_URL}}/img/ajax-loader.gif" id="loader" style="padding-left:5px; display:none" />
 	</div>
 	<div class="fieldWrapper fieldWrapperIndent">
 		<label>&nbsp;</label><input type="submit" value="Сохранить задачу" class="button" /><a href="{% if add %}{% url tasks_list %}{% else %}{% url task_details task.id %}{% endif %}">отмена</a>

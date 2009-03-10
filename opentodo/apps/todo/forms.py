@@ -18,6 +18,10 @@ class ProjectFormEdit(OpentodoModelForm):
 
 # Форма редактирования задачи
 class TaskFormEdit(OpentodoModelForm):
+    def __init__(self, user, *args, **kwargs):
+        super(TaskFormEdit, self).__init__(*args, **kwargs)
+        self.fields['project'].queryset = User.objects.get(pk=user.id).avail_projects.order_by('title')
+
     title = forms.CharField(widget=forms.Textarea)
     class Meta:
         model = Task

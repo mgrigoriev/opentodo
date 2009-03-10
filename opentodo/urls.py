@@ -23,6 +23,7 @@ urlpatterns += patterns('todo.views',
     url(r'^tasks/(?P<task_id>\d+)/to_done/$', 'task_to_done', name='task_to_done'),
     url(r'^tasks/(?P<task_id>\d+)/to_checked/$', 'task_to_checked', name='task_to_checked'),
     url(r'^tasks/(?P<task_id>\d+)/to_new/$', 'task_to_new', name='task_to_new'),
+    url(r'^tasks/delete_attach/(?P<attach_id>\d+)/$', 'delete_task_attach', name='delete_task_attach'),
 
     url(r'^projects/$', 'projects_list', name='projects_list'),
     url(r'^projects/new/$', 'add_project', name='add_project'),
@@ -30,5 +31,6 @@ urlpatterns += patterns('todo.views',
     url(r'^projects/(?P<project_id>\d+)/edit/$', 'edit_project', name='edit_project'),
     url(r'^projects/(?P<project_id>\d+)/delete/$', 'delete_project', name='delete_project'),
     url(r'^projects/delete_attach/(?P<attach_id>\d+)/$', 'delete_project_attach', name='delete_project_attach'), 
-    url(r'^tasks/delete_attach/(?P<attach_id>\d+)/$', 'delete_task_attach', name='delete_task_attach'),
+
+    url(r'^json/project_users/$', 'json_project_users', name='json_project_users'), 
 )
