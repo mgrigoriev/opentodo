@@ -98,7 +98,6 @@ def list(request, state=0):
         tasks = tasks.filter(assigned_to=request.user)
     elif folder == 'outbox':
         tasks = tasks.filter(author=request.user)
-
     
     # Доп. фильтр:
     if (params.get('author', False) and not folder == 'outbox') or (params.get('assigned_to', False) and not folder == 'inbox') or params.get('status', False):
@@ -394,15 +393,21 @@ def delete_task_attach(request, attach_id):
 # Добавить проект
 @login_required
 def add_project(request):
+    if not request.user.is_superuser:
+        return HttpResponseForbidden()
+
     if request.method == 'POST':
-        f = ProjectFormEdit(request.POST)
+        f = ProjectFormEdit(request.user, request.POST)
         if f.is_valid():
             prj = f.save(commit = False)
             prj.author = request.user
-            prj.save()
+            prj.save()            
+            f.save_m2m()
+            for su in User.objects.filter(is_superuser=True):
+                prj.users.add(su)
             return HttpResponseRedirect(reverse('projects_list'))
     else:
-        f = ProjectFormEdit()
+        f = ProjectFormEdit(request.user)
     
     return render_to_response('todo/project_edit.html', {'form': f, 'add': True, 'menu_active':'projects' }, context_instance=RequestContext(request))
 
@@ -415,25 +420,20 @@ def edit_project(request, project_id):
     except Task.DoesNotExist:
         raise Http404
 
-    try:
-        author = project.author
-    except User.DoesNotExist:
-        author = None
-
-    if not project.is_avail(request.user):
-        return HttpResponseForbidden()
-
-    if not (request.user.has_perm('todo.change_project') or request.user == author):
+    if not request.user.is_superuser:
         return HttpResponseForbidden()
 
     if request.method == 'POST':
-        f = ProjectFormEdit(request.POST, instance = project)
+        f = ProjectFormEdit(request.user, request.POST, instance = project)
         if f.is_valid():
             p = f.save(commit = False)
             p.save()
+            f.save_m2m()
+            for su in User.objects.filter(is_superuser=True):
+                p.users.add(su)
             return HttpResponseRedirect(reverse('project_details', args=(project_id,)))
     else:
-        f = ProjectFormEdit(instance = project)
+        f = ProjectFormEdit(request.user, instance = project)
     
     return render_to_response('todo/project_edit.html', {'form': f, 'project': project, 'menu_active':'projects' }, context_instance=RequestContext(request))
 

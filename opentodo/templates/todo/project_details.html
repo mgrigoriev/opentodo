@@ -18,13 +18,9 @@
 <b>Дата создания</b><br />
 <span>{{project.created_at|format_date:"short"}}</span>
 </div>
-{% ifequal project.author user %}
+{% if user.is_superuser %}
 	{% include "todo/project_actions.html" %}
-{% else %}
-	{% if perms.todo.change_project %}
-		{% include "todo/project_actions.html" %}
-	{% endif %}
-{% endifequal %}
+{% endif %}
 
 {% endblock %}
 
@@ -48,10 +44,6 @@
 {% for member in project.users.all %}
 {{member|username}}<br />
 {% endfor %}
-<div style="color: #999; padding-top: 7px; font-size:11pt">
-Добавление новых пользователей: <a href="../../admin/auth/user/" style="color:#999">Администрирование / Пользователи</a><br /> 
-Настройка доступа пользователей к проекту: <a href="../../admin/todo/project/{{project.id}}/" style="color:#999">Администрирование / Проекты / {{project.title}}</a><br />
-</div>
 </div>
 
 <a name="files"></a>

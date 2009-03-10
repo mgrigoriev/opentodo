@@ -8,7 +8,7 @@
 {% block content %}
 
 <h1 style="display: inline; padding-right: 15px">Проекты</h1>
-<a href="{% url add_project %}" class="do">добавить проект</a><br /><br />
+{% if user.is_superuser %}<a href="{% url add_project %}" class="do">добавить проект</a>{% endif %}<br /><br />
 
 {% if projects %}
 {% for p in projects %}

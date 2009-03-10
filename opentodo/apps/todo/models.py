@@ -39,7 +39,8 @@ class Project(models.Model):
     info = models.TextField("Описание", null=True, blank=True)
     created_at = models.DateTimeField("Дата добавления", auto_now_add=True)
     author = models.ForeignKey(User, null=True, db_column='author', related_name="projects", verbose_name="Автор")
-    users = models.ManyToManyField(User, verbose_name="Команда", related_name="avail_projects")
+    users = models.ManyToManyField(User, blank=True, null=True, verbose_name="Команда", related_name="avail_projects")
+
     def __unicode__(self):
         return self.title
     def _get_tasks_count(self):
@@ -51,6 +52,8 @@ class Project(models.Model):
 
     # Проект доступен для пользователя
     def is_avail(self, user):
+        if user.is_superuser:
+            return True
         try:
             user.avail_projects.get(pk=self.pk)
             return True

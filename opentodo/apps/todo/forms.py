@@ -4,6 +4,16 @@ from django.forms import ModelForm
 from django import forms
 from todo.models import *
 
+
+def username(user):
+    try:
+        if user.first_name and user.last_name:
+            return "%s %s" % (user.first_name, user.last_name)
+        else:
+            return "%s" % user.username
+    except:
+        return ""
+
 class OpentodoModelForm(ModelForm):
     class Media:
         css = { 'all': ('forms.css',) }
@@ -11,10 +21,16 @@ class OpentodoModelForm(ModelForm):
 
 # Форма редактирования проекта
 class ProjectFormEdit(OpentodoModelForm):
+    # Переопределяем конструктор, чтобы исключить из списка users (пользователи имеющие доступ к проекту) автора
+    # подразумевается что автор проекта имеет доступ по умолчанию и нет возможности его убрать из команды
+    def __init__(self, user, *args, **kwargs):
+        super(ProjectFormEdit, self).__init__(*args, **kwargs)
+#       self.fields['users'].queryset = User.objects.exclude(pk=user.id).order_by('first_name', 'last_name')       
+
     title = forms.CharField(widget=forms.Textarea)
     class Meta:
         model = Project
-        fields = ('title', 'info')
+        fields = ('title', 'info', 'users')
 
 # Форма редактирования задачи
 class TaskFormEdit(OpentodoModelForm):
