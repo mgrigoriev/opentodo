@@ -14,7 +14,7 @@ class TestViews(TestCase):
         self.c = Client()
 
         # user pk=1
-        user = User.objects.create(username="admin", email="admin@localhost", is_active=1, is_staff=1)
+        user = User.objects.create(username="admin", email="admin@localhost", is_active=1, is_staff=1, is_superuser=1)
         user.set_password('password')
         user.save()
 
