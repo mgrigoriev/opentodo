@@ -4,16 +4,7 @@ from django.forms import ModelForm
 from django import forms
 from todo.models import *
 from django.contrib.auth.models import User
-
-
-def username(user):
-    try:
-        if user.first_name and user.last_name:
-            return "%s %s" % (user.first_name, user.last_name)
-        else:
-            return "%s" % user.username
-    except:
-        return ""
+from todo.templatetags.todo_extras import username
 
 class OpentodoModelForm(ModelForm):
     class Media:
