@@ -363,7 +363,7 @@ def add_project(request):
         return HttpResponseForbidden()
 
     if request.method == 'POST':
-        f = ProjectFormEdit(request.user, request.POST)
+        f = ProjectFormEdit(request.POST)
         if f.is_valid():
             prj = f.save(commit = False)
             prj.author = request.user
@@ -373,9 +373,10 @@ def add_project(request):
                 prj.users.add(su)
             return HttpResponseRedirect(reverse('projects_list'))
     else:
-        f = ProjectFormEdit(request.user)
+        f = ProjectFormEdit()
     
-    return render_to_response('todo/project_edit.html', {'form': f, 'add': True, 'menu_active':'projects' }, context_instance=RequestContext(request))
+    admins = User.objects.filter(is_superuser=True)    
+    return render_to_response('todo/project_edit.html', {'form': f, 'add': True, 'menu_active':'projects', 'admins':admins }, context_instance=RequestContext(request))
 
 # Редактировать проект
 # access control +
@@ -387,7 +388,7 @@ def edit_project(request, project_id):
         return HttpResponseForbidden()
 
     if request.method == 'POST':
-        f = ProjectFormEdit(request.user, request.POST, instance = project)
+        f = ProjectFormEdit(request.POST, instance = project)
         if f.is_valid():
             p = f.save(commit = False)
             p.save()
@@ -396,9 +397,10 @@ def edit_project(request, project_id):
                 p.users.add(su)
             return HttpResponseRedirect(reverse('project_details', args=(project_id,)))
     else:
-        f = ProjectFormEdit(request.user, instance = project)
-    
-    return render_to_response('todo/project_edit.html', {'form': f, 'project': project, 'menu_active':'projects' }, context_instance=RequestContext(request))
+        f = ProjectFormEdit(instance = project)
+
+    admins = User.objects.filter(is_superuser=True)    
+    return render_to_response('todo/project_edit.html', {'form': f, 'project': project, 'menu_active':'projects', 'admins':admins }, context_instance=RequestContext(request))
 
 # Удалить проект
 # access control +

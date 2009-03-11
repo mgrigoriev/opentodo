@@ -46,13 +46,22 @@ div.editformWrapper {
 #editform br {
 	clear: left;
 }
-#editform textarea {
+#editform textarea, #projectform textarea {
 	width: 600px;
 }
-#editform #id_title {
+#editform #id_title, #projectform #id_title {
 	width: 600px;
 	height: 35px;
 }
+
+#projectform ul {
+	margin: 0;
+}
+#projectform li {
+	margin: 0;
+	list-style-type: none;
+}
+
 input.button {
 	padding: 1px 8px;
 	margin-right: 8px;

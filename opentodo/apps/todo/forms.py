@@ -3,6 +3,7 @@
 from django.forms import ModelForm
 from django import forms
 from todo.models import *
+from django.contrib.auth.models import User
 
 
 def username(user):
@@ -23,14 +24,19 @@ class OpentodoModelForm(ModelForm):
 class ProjectFormEdit(OpentodoModelForm):
     # Переопределяем конструктор, чтобы исключить из списка users (пользователи имеющие доступ к проекту) автора
     # подразумевается что автор проекта имеет доступ по умолчанию и нет возможности его убрать из команды
-    def __init__(self, user, *args, **kwargs):
-        super(ProjectFormEdit, self).__init__(*args, **kwargs)
-#       self.fields['users'].queryset = User.objects.exclude(pk=user.id).order_by('first_name', 'last_name')       
-
+    user_choices = []
+    initial_user_choices = []
+    user_list = User.objects.order_by('first_name', 'last_name')
+    for item in user_list:
+        user_choices.append((item.id, username(item)))
+        if item.is_superuser:
+            initial_user_choices.append(item.id)
+            
+    users = forms.MultipleChoiceField(choices=user_choices, widget=forms.CheckboxSelectMultiple(), required=False)
     title = forms.CharField(widget=forms.Textarea)
     class Meta:
         model = Project
-        fields = ('title', 'info', 'users')
+        fields = ('title', 'info')
 
 # Форма редактирования задачи
 class TaskFormEdit(OpentodoModelForm):
