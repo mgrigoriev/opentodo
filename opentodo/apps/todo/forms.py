@@ -21,9 +21,9 @@ class OpentodoModelForm(ModelForm):
         js = ('jquery.formvalidation.1.1.5.js',)
 
 # Форма редактирования проекта
-class ProjectFormEdit(OpentodoModelForm):
+class ProjectForm(OpentodoModelForm):
     def __init__(self, *args, **kwargs):
-        super(ProjectFormEdit, self).__init__(*args, **kwargs)
+        super(ProjectForm, self).__init__(*args, **kwargs)
         user_choices = []
         user_list = User.objects.order_by('first_name', 'last_name')
         for item in user_list:
@@ -36,9 +36,9 @@ class ProjectFormEdit(OpentodoModelForm):
         fields = ('title', 'info', 'users')
 
 # Форма редактирования задачи
-class TaskFormEdit(OpentodoModelForm):
+class TaskForm(OpentodoModelForm):
     def __init__(self, user, *args, **kwargs):
-        super(TaskFormEdit, self).__init__(*args, **kwargs)
+        super(TaskForm, self).__init__(*args, **kwargs)
         self.fields['project'].queryset = Project.objects.available_for(user)
 
     title = forms.CharField(widget=forms.Textarea)

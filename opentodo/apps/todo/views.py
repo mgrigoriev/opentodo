@@ -222,7 +222,7 @@ def edit(request, task_id):
         return HttpResponseForbidden()
 
     if request.method == 'POST':
-        f = TaskFormEdit(request.user, request.POST, instance = task)
+        f = TaskForm(request.user, request.POST, instance = task)
         if f.is_valid():
             t = f.save(commit = False)
             if t.deadline:
@@ -238,7 +238,7 @@ def edit(request, task_id):
             t.save()
             return HttpResponseRedirect(reverse('task_details', args=(task_id,)))
     else:
-        f = TaskFormEdit(request.user, instance = task)
+        f = TaskForm(request.user, instance = task)
     
     projects = Project.objects.available_for(request.user)
     users = users_in_projects(projects)
@@ -249,7 +249,7 @@ def edit(request, task_id):
 @login_required
 def add_task(request):
     if request.method == 'POST':
-        f = TaskFormEdit(request.user, request.POST)
+        f = TaskForm(request.user, request.POST)
         if f.is_valid():
             t = f.save(commit = False)
             if t.deadline:
@@ -268,7 +268,7 @@ def add_task(request):
         init_data = {
             'project': request.session.get('project_id',''),
         }
-        f = TaskFormEdit(request.user, initial=init_data)
+        f = TaskForm(request.user, initial=init_data)
     
     projects = Project.objects.available_for(request.user)
     users = users_in_projects(projects)
@@ -363,7 +363,7 @@ def add_project(request):
         return HttpResponseForbidden()
 
     if request.method == 'POST':
-        f = ProjectFormEdit(request.POST)
+        f = ProjectForm(request.POST)
         if f.is_valid():
             prj = f.save(commit = False)
             prj.author = request.user
@@ -371,7 +371,7 @@ def add_project(request):
             f.save_m2m()
             return HttpResponseRedirect(reverse('projects_list'))
     else:
-        f = ProjectFormEdit()
+        f = ProjectForm()
     
     return render_to_response('todo/project_edit.html', {'form': f, 'add': True, 'menu_active':'projects'}, context_instance=RequestContext(request))
 
@@ -385,14 +385,14 @@ def edit_project(request, project_id):
         return HttpResponseForbidden()
 
     if request.method == 'POST':
-        f = ProjectFormEdit(request.POST, instance = project)
+        f = ProjectForm(request.POST, instance = project)
         if f.is_valid():
             p = f.save(commit = False)
             p.save()
             f.save_m2m()
             return HttpResponseRedirect(reverse('project_details', args=(project_id,)))
     else:
-        f = ProjectFormEdit(instance = project)
+        f = ProjectForm(instance = project)
 
     return render_to_response('todo/project_edit.html', {'form': f, 'project': project, 'menu_active':'projects'}, context_instance=RequestContext(request))
 
