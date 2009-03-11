@@ -26,11 +26,11 @@ def list(request, state=0):
     filter_on = False
     
     # Получаем проекты и задачи, к которым есть доступ
-    projects = request.user.avail_projects.all()
+    projects = Project.objects.available_for(request.user)
     tasks = Task.objects.filter(project__in=projects)
     
     # Пользователи и статусы задач - для фильтра
-    users = User.objects.filter(avail_projects__in=projects).distinct().order_by('first_name', 'last_name')
+    users = users_in_projects(projects)
     states = Status.objects.all()
     
     # Запоминаем в сессии id проекта, если передано в GET
@@ -240,8 +240,8 @@ def edit(request, task_id):
     else:
         f = TaskFormEdit(request.user, instance = task)
     
-    projects = request.user.avail_projects.all()    
-    users = User.objects.filter(avail_projects__in=projects).distinct().order_by('first_name', 'last_name')
+    projects = Project.objects.available_for(request.user)
+    users = users_in_projects(projects)
 
     return render_to_response('todo/task_edit.html', {'form': f, 'task': task, 'users': users, 'menu_active':'tasks' }, context_instance=RequestContext(request))
 
@@ -270,8 +270,8 @@ def add_task(request):
         }
         f = TaskFormEdit(request.user, initial=init_data)
     
-    projects = request.user.avail_projects.all()    
-    users = User.objects.filter(avail_projects__in=projects).distinct().order_by('first_name', 'last_name')
+    projects = Project.objects.available_for(request.user)
+    users = users_in_projects(projects)
 
     return render_to_response('todo/task_edit.html', {'form': f, 'add': True, 'users': users, 'menu_active':'tasks' }, context_instance=RequestContext(request))
 
@@ -295,7 +295,7 @@ def delete(request, task_id):
 # access control +
 @login_required
 def projects_list(request, state=0):
-    projects = request.user.avail_projects.order_by('title')
+    projects = Project.objects.available_for(request.user)
     return render_to_response('todo/projects_list.html', {'projects': projects, 'menu_active':'projects' }, context_instance=RequestContext(request))
 
 # Информация о проекте + загрузка файлов
@@ -369,14 +369,11 @@ def add_project(request):
             prj.author = request.user
             prj.save()            
             f.save_m2m()
-            for su in User.objects.filter(is_superuser=True):
-                prj.users.add(su)
             return HttpResponseRedirect(reverse('projects_list'))
     else:
         f = ProjectFormEdit()
     
-    admins = User.objects.filter(is_superuser=True)    
-    return render_to_response('todo/project_edit.html', {'form': f, 'add': True, 'menu_active':'projects', 'admins':admins }, context_instance=RequestContext(request))
+    return render_to_response('todo/project_edit.html', {'form': f, 'add': True, 'menu_active':'projects'}, context_instance=RequestContext(request))
 
 # Редактировать проект
 # access control +
@@ -393,14 +390,11 @@ def edit_project(request, project_id):
             p = f.save(commit = False)
             p.save()
             f.save_m2m()
-            for su in User.objects.filter(is_superuser=True):
-                p.users.add(su)
             return HttpResponseRedirect(reverse('project_details', args=(project_id,)))
     else:
         f = ProjectFormEdit(instance = project)
 
-    admins = User.objects.filter(is_superuser=True)    
-    return render_to_response('todo/project_edit.html', {'form': f, 'project': project, 'menu_active':'projects', 'admins':admins }, context_instance=RequestContext(request))
+    return render_to_response('todo/project_edit.html', {'form': f, 'project': project, 'menu_active':'projects'}, context_instance=RequestContext(request))
 
 # Удалить проект
 # access control +
@@ -523,12 +517,11 @@ def json_project_users(request):
         project = get_object_or_404(Project, pk=project_id)
         if not project.is_avail(request.user):
             return HttpResponseForbidden()
-        users = project.users.order_by('first_name', 'last_name')
+        users = users_in_projects(project)
     else:
-        projects = request.user.avail_projects.all()
-        users = User.objects.filter(avail_projects__in=projects).distinct().order_by('first_name', 'last_name')        
+        projects = Project.objects.available_for(request.user)
+        users = users_in_projects(projects)
     return render_to_response('todo/json_project_users.html', {'users': users}, context_instance=RequestContext(request))
-
 
 # 403 Forbidden
 @login_required

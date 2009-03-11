@@ -7,16 +7,6 @@ $(document).ready(function(){
 		err_class: "invalidInput",
 		display_alert: false
 	});
-
-	var admins = [{% for admin in admins %}'{{admin.id}}'{% if not forloop.last %},{% endif %}{% endfor %}]
-	
-	$('input:checkbox').each( function() {
-		val = this.value;
-		if (admins.indexOf(val) != -1) {
-			this.disabled = true;
-			this.checked = true;
-		}
-	});
 });
 </script> 
 
@@ -36,7 +26,7 @@ $(document).ready(function(){
 		<td>{{form.info}}</td>
 	</tr>
 	<tr>
-		<td style="padding-right:10px; text-align:right"><span class="red">*</span> <label for="id_users">Имеют доступ:</label></td>
+		<td style="padding-right:10px; text-align:right"><span class="red">*</span> <label for="id_users">Пользователи:</label><br /><span style="color:#999">(aдминистраторы имеют доступ в любом случае)</span></td>
 		<td>{{form.users}}</td>
 	</tr>
 	<tr>
@@ -46,8 +36,6 @@ $(document).ready(function(){
 	</table>
 </form>
 </div>
-
-
 
 
 {% if add %}

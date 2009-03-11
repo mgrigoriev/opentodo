@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.db import models
+from django.db.models import Q
 from django.contrib.auth.models import User
 
 # Для уведомлений по e-mail
@@ -18,6 +19,8 @@ TASK_NOTIF_SUBJECTS = {
     5: 'Задача открыта заново'
 }
 
+#---------------------------------------------------
+
 # Удаляет дублирующие значения из списка
 def uniqs(seq):
     return dict(zip(seq, [None,]*len(seq))).keys()
@@ -31,15 +34,33 @@ def make_upload_path(instance, filename):
 
     elif isinstance(instance, TaskAttach):
         project_id = instance.task.project.id
-        return u"%s/%s/tasks/%s" % (upload_path, project_id, filename)    
+        return u"%s/%s/tasks/%s" % (upload_path, project_id, filename)
+
+# Пользователи в проектах
+def users_in_projects(projects):
+    users = User.objects.filter(
+            Q(avail_projects__in=projects) | Q(is_superuser=True)).distinct().order_by('first_name', 'last_name')
+    return users
+
+#---------------------------------------------------
+# Модели
 
 # Проекты
+class ProjectManager(models.Manager):
+    # Проекты, доступные для пользователя
+    def available_for(self, user):
+        if user.is_superuser:
+            return self.all().order_by('title')
+        else:
+            return user.avail_projects.all().order_by('title')     
+
 class Project(models.Model):
     title = models.CharField("Проект", max_length=255)
     info = models.TextField("Описание", null=True, blank=True)
     created_at = models.DateTimeField("Дата добавления", auto_now_add=True)
     author = models.ForeignKey(User, null=True, db_column='author', related_name="projects", verbose_name="Автор")
     users = models.ManyToManyField(User, blank=True, null=True, verbose_name="Команда", related_name="avail_projects")
+    objects = ProjectManager()
 
     def __unicode__(self):
         return self.title
@@ -59,6 +80,10 @@ class Project(models.Model):
             return True
         except Project.DoesNotExist:
             return False
+
+    # Пользователи, имеющие доступ к проекту
+    def allowed_users(self):
+        pass
 
     # При добавлении проекта добавляем автора в команду
     def save(self):

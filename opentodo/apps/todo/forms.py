@@ -22,27 +22,24 @@ class OpentodoModelForm(ModelForm):
 
 # Форма редактирования проекта
 class ProjectFormEdit(OpentodoModelForm):
-    # Переопределяем конструктор, чтобы исключить из списка users (пользователи имеющие доступ к проекту) автора
-    # подразумевается что автор проекта имеет доступ по умолчанию и нет возможности его убрать из команды
-    user_choices = []
-    initial_user_choices = []
-    user_list = User.objects.order_by('first_name', 'last_name')
-    for item in user_list:
-        user_choices.append((item.id, username(item)))
-        if item.is_superuser:
-            initial_user_choices.append(item.id)
-            
-    users = forms.MultipleChoiceField(choices=user_choices, widget=forms.CheckboxSelectMultiple(), required=False)
+    def __init__(self, *args, **kwargs):
+        super(ProjectFormEdit, self).__init__(*args, **kwargs)
+        user_choices = []
+        user_list = User.objects.order_by('first_name', 'last_name')
+        for item in user_list:
+            user_choices.append((item.id, username(item)))
+        self.fields['users'].choices = user_choices
+
     title = forms.CharField(widget=forms.Textarea)
     class Meta:
         model = Project
-        fields = ('title', 'info')
+        fields = ('title', 'info', 'users')
 
 # Форма редактирования задачи
 class TaskFormEdit(OpentodoModelForm):
     def __init__(self, user, *args, **kwargs):
         super(TaskFormEdit, self).__init__(*args, **kwargs)
-        self.fields['project'].queryset = User.objects.get(pk=user.id).avail_projects.order_by('title')
+        self.fields['project'].queryset = Project.objects.available_for(user)
 
     title = forms.CharField(widget=forms.Textarea)
     class Meta:
