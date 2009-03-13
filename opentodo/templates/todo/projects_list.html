@@ -14,6 +14,9 @@
 {% for p in projects %}
 	<a href="{% url project_details p.id %}" style="font-size:130%; line-height: 175%">{{p.title}}</a>&nbsp;&nbsp;{% if p.files.count %}<a href="{% url project_details p.id %}#files"><img src="{{MEDIA_URL}}/img/attach.gif" style="vertical-align:middle;border:0" /></a>{% endif %}<br />
 {% endfor %}
+{% else %}
+Тут пока пусто.<br />
+Обратитесь к администратору с просьбой включить вас в команду какого-нибудь проекта.
 {% endif %}
 
 {% endblock %}

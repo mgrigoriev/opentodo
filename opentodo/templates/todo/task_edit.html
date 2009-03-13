@@ -5,7 +5,13 @@
 {% block title %}{% if add %}Добавление задачи{% else %}Редактирование задачи "{{task}}"{% endif %}{% endblock %}
 
 {% block content %}
+
 <h1>{% if add %}Добавление{% else %}Редактирование{% endif %} задачи</h1>
-{% include "todo/task_form.html" %}
+
+{% if no_available_projects %}
+Нет проектов, в которые можно добавить задачу.<br />Обратитесь к администратору с просьбой включить вас в команду проекта.
+{% else %}
+	{% include "todo/task_form.html" %}
+{% endif %}
 
 {% endblock %}

@@ -248,6 +248,10 @@ def edit(request, task_id):
 # Добавить задачу
 @login_required
 def add_task(request):
+    projects = Project.objects.available_for(request.user)
+    if not projects:
+        return render_to_response('todo/task_edit.html', { 'no_available_projects': True, 'menu_active':'tasks', 'add':True}, context_instance=RequestContext(request))    
+
     if request.method == 'POST':
         f = TaskForm(request.user, request.POST)
         if f.is_valid():
@@ -270,7 +274,6 @@ def add_task(request):
         }
         f = TaskForm(request.user, initial=init_data)
     
-    projects = Project.objects.available_for(request.user)
     users = users_in_projects(projects)
 
     return render_to_response('todo/task_edit.html', {'form': f, 'add': True, 'users': users, 'menu_active':'tasks' }, context_instance=RequestContext(request))
