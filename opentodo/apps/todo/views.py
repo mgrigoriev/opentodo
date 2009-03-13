@@ -3,7 +3,7 @@
 from django.conf import settings
 from django.shortcuts import render_to_response
 from django.http import HttpResponse, HttpResponseRedirect, Http404, HttpRequest, HttpResponseForbidden
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, get_list_or_404
 from annoying.functions import get_object_or_None
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
@@ -517,13 +517,13 @@ def del_comment(request, comment_id):
 def json_project_users(request):
     if request.GET.get('id', '') != '':
         project_id = request.GET['id']
-        project = get_object_or_404(Project, pk=project_id)
-        if not project.is_avail(request.user):
+        projects = get_list_or_404(Project, pk=project_id)
+        if not projects[0].is_avail(request.user):
             return HttpResponseForbidden()
-        users = users_in_projects(project)
     else:
         projects = Project.objects.available_for(request.user)
-        users = users_in_projects(projects)
+
+    users = users_in_projects(projects)
     return render_to_response('todo/json_project_users.html', {'users': users}, context_instance=RequestContext(request))
 
 # 403 Forbidden

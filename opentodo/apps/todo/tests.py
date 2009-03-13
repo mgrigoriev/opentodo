@@ -52,6 +52,7 @@ class TestViews(TestCase):
                     ("/projects/new/", 200 ),
                     ("/projects/2/", 200),
                     ("/projects/2/edit/", 200),
+                    ("/json/project_users/", 200),
                     ("/projects/2/delete/", 302),
                ]
 
