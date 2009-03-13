@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from django.conf import settings
-from django.shortcuts import render_to_response
 from django.http import HttpResponse, HttpResponseRedirect, Http404, HttpRequest, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, get_list_or_404
 from annoying.functions import get_object_or_None
+from annoying.decorators import render_to
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.template import RequestContext, loader
@@ -20,6 +20,7 @@ def index(request):
 # Список задач
 # access control +
 @login_required
+@render_to('todo/todo_list.html')
 def list(request, state=0):
     order = direct = ''
     project = None
@@ -179,11 +180,12 @@ def list(request, state=0):
     page_num = int(request.GET.get('page', '1'))
     page = paginator.page(page_num)
 
-    return render_to_response('todo/todo_list.html', {'tasks':page.object_list, 'page':page, 'paginator':paginator, 'current_page':page_num, 'projects':projects, 'project':project, 'params':params, 'folder':folder, 'order':order, 'dir':direct, 'menu_active':'tasks', 'users':users, 'states':states, 'filter_on':filter_on }, context_instance=RequestContext(request))
+    return {'tasks': page.object_list, 'page': page, 'paginator': paginator, 'current_page': page_num, 'projects': projects, 'project': project, 'params': params, 'folder': folder, 'order': order, 'dir': direct, 'menu_active': 'tasks', 'users': users, 'states': states, 'filter_on': filter_on}
 
 # Информация о задаче + загрузка файлов
 # access control +
 @login_required
+@render_to('todo/task_details.html')
 def details(request, task_id):
     task = get_object_or_404(Task, pk=task_id)
 
@@ -206,11 +208,12 @@ def details(request, task_id):
     else:
         f = TaskAttachForm(instance=task_attach)
 
-    return render_to_response('todo/task_details.html', {'task': task, 'menu_active':'tasks', 'attachments':attachments, 'f':f }, context_instance=RequestContext(request))
+    return {'task': task, 'menu_active': 'tasks', 'attachments': attachments, 'f': f}
 
 # Редактировать задачу
 # access control +
 @login_required
+@render_to('todo/task_edit.html')
 def edit(request, task_id):
     task = get_object_or_404(Task, pk=task_id)
 
@@ -243,14 +246,15 @@ def edit(request, task_id):
     projects = Project.objects.available_for(request.user)
     users = users_in_projects(projects)
 
-    return render_to_response('todo/task_edit.html', {'form': f, 'task': task, 'users': users, 'menu_active':'tasks' }, context_instance=RequestContext(request))
+    return {'form': f, 'task': task, 'users': users, 'menu_active': 'tasks'}
 
 # Добавить задачу
 @login_required
+@render_to('todo/task_edit.html')
 def add_task(request):
     projects = Project.objects.available_for(request.user)
     if not projects:
-        return render_to_response('todo/task_edit.html', { 'no_available_projects': True, 'menu_active':'tasks', 'add':True}, context_instance=RequestContext(request))    
+        return {'no_available_projects': True, 'menu_active': 'tasks', 'add': True}
 
     if request.method == 'POST':
         f = TaskForm(request.user, request.POST)
@@ -276,7 +280,7 @@ def add_task(request):
     
     users = users_in_projects(projects)
 
-    return render_to_response('todo/task_edit.html', {'form': f, 'add': True, 'users': users, 'menu_active':'tasks' }, context_instance=RequestContext(request))
+    return {'form': f, 'add': True, 'users': users, 'menu_active': 'tasks'}
 
 # Удалить задачу
 # access control +
@@ -297,13 +301,15 @@ def delete(request, task_id):
 # Список проектов
 # access control +
 @login_required
+@render_to('todo/projects_list.html')
 def projects_list(request, state=0):
     projects = Project.objects.available_for(request.user)
-    return render_to_response('todo/projects_list.html', {'projects': projects, 'menu_active':'projects' }, context_instance=RequestContext(request))
+    return {'projects': projects, 'menu_active': 'projects'}
 
 # Информация о проекте + загрузка файлов
 # access control +
 @login_required
+@render_to('todo/project_details.html')
 def project_details(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
 
@@ -324,7 +330,7 @@ def project_details(request, project_id):
     else:
         f = ProjectAttachForm(instance=project_attach)
 
-    return render_to_response('todo/project_details.html', {'project':project, 'menu_active':'projects', 'attachments':attachments, 'f':f }, context_instance=RequestContext(request))
+    return {'project':project, 'menu_active':'projects', 'attachments':attachments, 'f':f}
 
 # Удалить файл, прикрепленный к проекту
 # access control +
@@ -361,6 +367,7 @@ def delete_task_attach(request, attach_id):
 
 # Добавить проект
 @login_required
+@render_to('todo/project_edit.html')
 def add_project(request):
     if not request.user.is_superuser:
         return HttpResponseForbidden()
@@ -376,11 +383,12 @@ def add_project(request):
     else:
         f = ProjectForm()
     
-    return render_to_response('todo/project_edit.html', {'form': f, 'add': True, 'menu_active':'projects'}, context_instance=RequestContext(request))
+    return {'form': f, 'add': True, 'menu_active': 'projects'}
 
 # Редактировать проект
 # access control +
 @login_required
+@render_to('todo/project_edit.html')
 def edit_project(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
 
@@ -397,11 +405,12 @@ def edit_project(request, project_id):
     else:
         f = ProjectForm(instance = project)
 
-    return render_to_response('todo/project_edit.html', {'form': f, 'project': project, 'menu_active':'projects'}, context_instance=RequestContext(request))
+    return {'form': f, 'project': project, 'menu_active': 'projects'}
 
 # Удалить проект
 # access control +
 @login_required
+@render_to('todo/project_delete_cannot.html')
 def delete_project(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
 
@@ -413,7 +422,7 @@ def delete_project(request, project_id):
         return HttpResponseForbidden()
 
     if project.tasks_count > 0:
-        return render_to_response('todo/project_delete_cannot.html', {'project': project, 'menu_active':'projects' }, context_instance=RequestContext(request))
+        return {'project': project, 'menu_active': 'projects'}
     else:
         project.delete()
         return HttpResponseRedirect(reverse('projects_list'))
@@ -514,6 +523,7 @@ def del_comment(request, comment_id):
 
 # Список пользователей, имеющих доступ к проекту, в формате JSON (для формы задачи)
 @login_required
+@render_to('todo/json_project_users.html')
 def json_project_users(request):
     if request.GET.get('id', '') != '':
         project_id = request.GET['id']
@@ -524,7 +534,7 @@ def json_project_users(request):
         projects = Project.objects.available_for(request.user)
 
     users = users_in_projects(projects)
-    return render_to_response('todo/json_project_users.html', {'users': users}, context_instance=RequestContext(request))
+    return {'users': users}
 
 # 403 Forbidden
 @login_required
