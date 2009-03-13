@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime, date
+from django.contrib.auth.models import User
+from todo.models import Status
 from django.utils.safestring import mark_safe
 from django import template
 
@@ -121,3 +123,39 @@ def crop(text, count):
     if len(text) > len(out):
         out += '&hellip;'
     return mark_safe(out)
+
+"""
+    Параметры доп. фильтра для отображения в подсказке ссылки
+"""
+@register.filter
+def filter_options(params, folder):
+
+    STATES_PLURAL = {1: u'Новые', 2: u'Принятые', 3: u'Завершенные', 4: u'Завершенные и одобренные'}
+
+    author = assigned_to = status = ''
+    if params.get('author', False) and not folder == 'outbox':
+        author_id = params['author']
+        author = User.objects.get(pk=author_id)
+        author = username(author)
+    else:
+        author = ' '
+    if params.get('assigned_to', False) and not folder == 'inbox':
+        assigned_to_id = params['assigned_to']
+        assigned_to = User.objects.get(pk=assigned_to_id)
+        assigned_to = username(assigned_to)
+    else:
+        assigned_to = ' '
+    if params.get('status', False):
+        if params['status'] in (1, 2, 3, 4):
+            status = STATES_PLURAL[params['status']]
+        elif params['status'] == 'all_active':
+            status = u'Активные'
+    else:
+        status = ''
+  
+    out = status
+    if author != ' ' or assigned_to != ' ':
+        if status:
+            out += '<span style="color:#999">, </span>'
+        out += "%s &rarr; %s" % (author, assigned_to)
+    return mark_safe('<nobr>(' + out + ')</nobr>')
