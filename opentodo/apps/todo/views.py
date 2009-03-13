@@ -18,7 +18,7 @@ def index(request):
     return HttpResponseRedirect(reverse('tasks_list'))
 
 # Список задач
-# access control +
+# Доступ: все - видят задачи проектов, участниками которых они являются; администраторы
 @login_required
 @render_to('todo/todo_list.html')
 def list(request, state=0):
@@ -183,7 +183,7 @@ def list(request, state=0):
     return {'tasks': page.object_list, 'page': page, 'paginator': paginator, 'current_page': page_num, 'projects': projects, 'project': project, 'params': params, 'folder': folder, 'order': order, 'dir': direct, 'menu_active': 'tasks', 'users': users, 'states': states, 'filter_on': filter_on}
 
 # Информация о задаче + загрузка файлов
-# access control +
+# Доступ: участники проекта, администраторы
 @login_required
 @render_to('todo/task_details.html')
 def details(request, task_id):
@@ -210,8 +210,8 @@ def details(request, task_id):
 
     return {'task': task, 'menu_active': 'tasks', 'attachments': attachments, 'f': f}
 
-# Редактировать задачу
-# access control +
+# Редактирование задачи
+# Доступ: автор задачи, администраторы
 @login_required
 @render_to('todo/task_edit.html')
 def edit(request, task_id):
@@ -248,7 +248,8 @@ def edit(request, task_id):
 
     return {'form': f, 'task': task, 'users': users, 'menu_active': 'tasks'}
 
-# Добавить задачу
+# Добавление задачи
+# Доступ: участники проекта, администраторы
 @login_required
 @render_to('todo/task_edit.html')
 def add_task(request):
@@ -259,6 +260,9 @@ def add_task(request):
     if request.method == 'POST':
         f = TaskForm(request.user, request.POST)
         if f.is_valid():
+            if not f.cleaned_data['project'].is_avail(request.user):
+                return HttpResponseForbidden()
+
             t = f.save(commit = False)
             if t.deadline:
                 t.has_deadline = True
@@ -282,8 +286,8 @@ def add_task(request):
 
     return {'form': f, 'add': True, 'users': users, 'menu_active': 'tasks'}
 
-# Удалить задачу
-# access control +
+# Удаление задачи
+# Доступ: автор задачи, администраторы
 @login_required
 def delete(request, task_id):
     task = get_object_or_404(Task, pk=task_id)
@@ -299,7 +303,7 @@ def delete(request, task_id):
     return HttpResponseRedirect(reverse('tasks_list'))
 
 # Список проектов
-# access control +
+# Доступ: все - видят проекты, в которых участвуют; администраторы
 @login_required
 @render_to('todo/projects_list.html')
 def projects_list(request, state=0):
@@ -307,7 +311,7 @@ def projects_list(request, state=0):
     return {'projects': projects, 'menu_active': 'projects'}
 
 # Информация о проекте + загрузка файлов
-# access control +
+# Доступ: участники проекта, администраторы
 @login_required
 @render_to('todo/project_details.html')
 def project_details(request, project_id):
@@ -332,8 +336,8 @@ def project_details(request, project_id):
 
     return {'project':project, 'menu_active':'projects', 'attachments':attachments, 'f':f}
 
-# Удалить файл, прикрепленный к проекту
-# access control +
+# Удаление файла, прикрепленного к проекту
+# Доступ: автор файла, администраторы
 @login_required
 def delete_project_attach(request, attach_id):
     attach = get_object_or_404(ProjectAttach, pk=attach_id)
@@ -349,8 +353,8 @@ def delete_project_attach(request, attach_id):
     return HttpResponseRedirect(reverse('project_details', args=(attach.project.id,)))
     
 
-# Удалить файл, прикрепленный к задаче
-# access control +
+# Удаление файла, прикрепленного к задаче
+# Доступ: автор файла, администраторы
 @login_required
 def delete_task_attach(request, attach_id):
     attach = get_object_or_404(TaskAttach, pk=attach_id)
@@ -365,7 +369,8 @@ def delete_task_attach(request, attach_id):
     attach.delete()
     return HttpResponseRedirect(reverse('task_details', args=(attach.task.id,)))
 
-# Добавить проект
+# Добавление проекта
+# Доступ: администраторы
 @login_required
 @render_to('todo/project_edit.html')
 def add_project(request):
@@ -385,8 +390,8 @@ def add_project(request):
     
     return {'form': f, 'add': True, 'menu_active': 'projects'}
 
-# Редактировать проект
-# access control +
+# Редактирование проекта
+# Доступ: администраторы
 @login_required
 @render_to('todo/project_edit.html')
 def edit_project(request, project_id):
@@ -407,8 +412,8 @@ def edit_project(request, project_id):
 
     return {'form': f, 'project': project, 'menu_active': 'projects'}
 
-# Удалить проект
-# access control +
+# Удаление проекта
+# Доступ: администраторы
 @login_required
 @render_to('todo/project_delete_cannot.html')
 def delete_project(request, project_id):
@@ -426,9 +431,9 @@ def delete_project(request, project_id):
     else:
         project.delete()
         return HttpResponseRedirect(reverse('projects_list'))
-        
+
 # Принять задачу
-# Имеет право: assigned_to (тот, кому назначена задача)
+# Доступ: assigned_to (тот, кому назначена задача)
 @login_required
 def task_to_accepted(request, task_id):
     task = get_object_or_404(Task, pk=task_id)
@@ -444,7 +449,7 @@ def task_to_accepted(request, task_id):
     return HttpResponseRedirect(reverse('task_details', args=(task_id,)))
 
 # Завершить задачу
-# Имеет право: assigned_to (тот, кому назначена задача)
+# Доступ: assigned_to (тот, кому назначена задача)
 @login_required
 def task_to_done(request, task_id):
     task = get_object_or_404(Task, pk=task_id)
@@ -460,7 +465,7 @@ def task_to_done(request, task_id):
     return HttpResponseRedirect(reverse('task_details', args=(task_id,)))
 
 # Подтвердить завершение задачи (контроль)
-# Имеет право: author (тот, кто назначил)
+# Доступ: author (тот, кто назначил)
 @login_required
 def task_to_checked(request, task_id):
     task = get_object_or_404(Task, pk=task_id)
@@ -476,7 +481,7 @@ def task_to_checked(request, task_id):
     return HttpResponseRedirect(reverse('task_details', args=(task_id,)))
 
 # Открыть заново задачу
-# Имеет право: author (тот, кто назначил)
+# Доступ: author (тот, кто назначил)
 @login_required
 def task_to_new(request, task_id):
     task = get_object_or_404(Task, pk=task_id)
@@ -490,8 +495,8 @@ def task_to_new(request, task_id):
     task.mail_notify(request.get_host(), True)
     return HttpResponseRedirect(reverse('task_details', args=(task_id,)))
 
-# Добавить комментарий к задаче
-# access control +
+# Добавление комментария к задаче
+# Доступ: участники проекта
 @login_required
 def add_comment(request, task_id):    
     if request.method == 'POST' and request.POST.get('message', '') != '':
@@ -507,7 +512,8 @@ def add_comment(request, task_id):
 
     return HttpResponseRedirect(reverse('task_details', args=(task_id,)))
 
-# Удалить комментарий к задаче
+# Удаление комментария к задаче
+# Доступ: автор комментария
 @login_required
 def del_comment(request, comment_id):
     comment = get_object_or_404(Comment, pk=comment_id)
@@ -521,7 +527,10 @@ def del_comment(request, comment_id):
     comment.delete()
     return HttpResponseRedirect(reverse('task_details', args=(comment.task.id,)))
 
-# Список пользователей, имеющих доступ к проекту, в формате JSON (для формы задачи)
+# Список пользователей, имеющих доступ к проекту, в формате JSON
+# Используется в форме задачи, подгружается в поле 'Ответственный' при выборе проекта.
+# Если выбран проект, то в списке пользователей - участники проекта, администраторы.
+# Если проект не выбран - участники всех проектов, к которым имеет доступ текущий пользователь; администраторы.
 @login_required
 @render_to('todo/json_project_users.html')
 def json_project_users(request):
@@ -536,7 +545,7 @@ def json_project_users(request):
     users = users_in_projects(projects)
     return {'users': users}
 
-# 403 Forbidden
+# Отображение страницы 403 Forbidden - доступ запрещен
 @login_required
 def forbidden(request, template_name='403.html'):
     t = loader.get_template(template_name)

@@ -128,9 +128,9 @@ h1#todolist {
 	font-size: 145%;
 }
 a.filter_on, a.filter_on:visited {
+	color: #5cb052;
 	text-decoration: none;
-	color: #009900;
-	border-bottom: 1px dashed #009900;
+	border-bottom: 1px solid #ddeedb;
 }
 a.filter_off, a.filter_off:visited{
 	color:#888;
