@@ -29,21 +29,17 @@
 <h2 id="task-title">{{project.title}}</h2>
 {% if project.info %}
 <div id="task-info">{{project.info|sanitize}}</div>
+<div style="color:#000; padding: 5px 0">
+<b>Участники:</b> {% for member in project.users.all %}{{member|username}}{% if not forloop.last %}, {% endif %}{% endfor %}
+</div>
 {% endif %}
 
 <div id="task-action">
-<a href="{% url tasks_list %}?project_id={{project.id}}&folder=all" class="bigger">Задачи</a>
+<a href="{% url tasks_list %}?project_id={{project.id}}&folder=all" class="bigger"><i>Задачи проекта</i></a>
 ({{project.tasks_count}}{%if project.tasks_active_count%}, <b>{{project.tasks_active_count}}</b>{% endif %})
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="{% url projects_list %}" class="bigger">Назад к проектам &rarr;</a>
+<a href="{% url projects_list %}" class="bigger">Назад к списку проектов</a>
 </div>
-</div>
-
-<h1>Команда</h1>
-<div id="team-wrapper" style="font-size:11pt; line-height:1.4em; padding-bottom: 20px">
-{% for member in project.users.all %}
-{{member|username}}<br />
-{% endfor %}
 </div>
 
 <a name="files"></a>
