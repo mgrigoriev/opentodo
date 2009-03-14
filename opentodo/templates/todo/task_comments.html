@@ -5,7 +5,7 @@
 <div id="comment-container">
 {% for comment in task.comments.all %}
 	<div class="comment">	
-	{{comment.message|linebreaksbr}}
+	{{comment.message|sanitize}}
 	<div class="comment-extra">{{comment.author|username}}, {{comment.created_at|format_date}}
 	{% ifequal comment.author user %}
 		{% include "todo/comment_actions.html" %}
@@ -26,4 +26,7 @@
 <input type="submit" value="Добавить комментарий" class="button" />
 </form>
 </div>
+
+{% include "todo/allowed_htmltags.html" %}
+
 <br />

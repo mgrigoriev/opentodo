@@ -48,6 +48,7 @@ div.editformWrapper {
 }
 #editform textarea, #projectform textarea {
 	width: 600px;
+	height: 230px;
 }
 #editform #id_title, #projectform #id_title {
 	width: 600px;

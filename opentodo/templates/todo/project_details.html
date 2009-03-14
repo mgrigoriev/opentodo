@@ -28,7 +28,7 @@
 <div id="task-container" style="padding-bottom:0">
 <h2 id="task-title">{{project.title}}</h2>
 {% if project.info %}
-<div id="task-info">{{project.info|linebreaksbr}}</div>
+<div id="task-info">{{project.info|sanitize}}</div>
 {% endif %}
 
 <div id="task-action">

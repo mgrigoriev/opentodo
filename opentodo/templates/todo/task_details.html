@@ -57,7 +57,7 @@
 <div id="task-container">
 
 <h2 id="task-title">{{task.title}}</h2>
-{% if task.info %}<div id="task-info">{{task.info|linebreaksbr}}</div>{% endif %}
+{% if task.info %}<div id="task-info">{{task.info|sanitize}}</div>{% endif %}
 </div>
 
 <div id="task-action">

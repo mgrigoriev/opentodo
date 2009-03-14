@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime, date
+import re
 from django.contrib.auth.models import User
 from todo.models import Status
 from django.utils.safestring import mark_safe
+from BeautifulSoup import BeautifulSoup, Comment
 from django import template
 
 register = template.Library()
@@ -159,3 +161,40 @@ def filter_options(params, folder):
             out += '<span style="color:#999">, </span>'
         out += "%s &rarr; %s" % (author, assigned_to)
     return mark_safe('<nobr>(' + out + ')</nobr>')
+
+
+"""
+    Удаление html-тегов из текста за исключением разрешенных;
+    расстановка <br /> в конце строк (за исключением текста внутри <pre>);
+    форматирование списков: "- " в начале строки заменяется на тире.
+"""
+def sanitize_html(value):
+    valid_tags = 'b i a pre br'.split()
+    valid_attrs = 'href src'.split()
+    soup = BeautifulSoup(value)
+    for comment in soup.findAll(
+        text=lambda text: isinstance(text, Comment)):
+        comment.extract()
+    for tag in soup.findAll(True):
+        if tag.name not in valid_tags:
+            tag.hidden = True
+        tag.attrs = [(attr, val) for attr, val in tag.attrs
+                     if attr in valid_attrs]
+    value = soup.renderContents().decode('utf8').replace('javascript:', '')
+    
+    out = ''
+    linebreaks = True
+    for line in value.split("\n"):
+        if '<pre>' in line:
+            linebreaks = False
+        if '</pre>' in line:
+            linebreaks = True
+
+        if linebreaks:
+            p = re.compile('^- ')
+            out += p.sub('&#151;&nbsp;', line) + "<br />\n"
+        else:
+            out += line
+
+    return mark_safe(out)
+register.filter('sanitize', sanitize_html)

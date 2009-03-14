@@ -82,6 +82,8 @@ function load_users() {
 </form>
 </div>
 
+{% include "todo/allowed_htmltags.html" %}
+
 {% if add %}
 <script language="javascript">
 if (document.getElementById('id_project').selectedIndex > 0) {

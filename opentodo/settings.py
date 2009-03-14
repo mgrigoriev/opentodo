@@ -66,7 +66,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.doc.XViewMiddleware',
-    'todo.middleware.StripWhitespaceMiddleware',
+#   'todo.middleware.StripWhitespaceMiddleware',
     'todo.middleware.Custom403Middleware',
 )
 FILE_CHARSET = 'utf-8'
