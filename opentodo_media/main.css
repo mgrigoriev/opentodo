@@ -309,7 +309,7 @@ div.attachments table.common td {
    z-index: 3;
    display: none;
    background-color: #fff;
-   font-size: 11pt;
-   color: #aaa;
+   font-size: 10pt;
+   color: #a0a0a0;
    padding: 5px;
 }
