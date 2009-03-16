@@ -54,7 +54,7 @@ def list(request, state=0):
 
     # Если сменили группу задач либо настройки фильтра сброшены или изменены, удаляем существующие
     if request.GET.get('folder', False) or (request.GET.get('filter', False) in ('on', 'off')):
-        for key in ('author', 'assigned_to', 'status'):
+        for key in ('author', 'assigned_to', 'status', 'search_title'):
             try:
                 del request.session[key]
             except KeyError:
@@ -68,6 +68,8 @@ def list(request, state=0):
             request.session['assigned_to'] = request.GET['assigned_to']
         if request.GET.get('status', False):
             request.session['status'] = request.GET['status']
+        if request.GET.get('search_title', False):
+            request.session['search_title'] = request.GET['search_title']
 
     params = request.session
 
@@ -99,7 +101,7 @@ def list(request, state=0):
         tasks = tasks.filter(author=request.user)
     
     # Доп. фильтр:
-    if (params.get('author', False) and not folder == 'outbox') or (params.get('assigned_to', False) and not folder == 'inbox') or params.get('status', False):
+    if (params.get('author', False) and not folder == 'outbox') or (params.get('assigned_to', False) and not folder == 'inbox') or params.get('status', False) or params.get('search_title', False):
         filter_on = True
         # Автор
         if params.get('author', False) and not folder == 'outbox':
@@ -122,6 +124,9 @@ def list(request, state=0):
                 tasks = tasks.filter(status__id=params['status'])
             elif params['status'] == 'all_active':
                 tasks = tasks.exclude(status__id=3).exclude(status__id=4)
+        # Название
+        if params.get('search_title', False):
+            tasks = tasks.filter(title__icontains=params['search_title'])
 
     # Сортировка:
     if params.get('order', False):

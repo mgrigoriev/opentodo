@@ -135,27 +135,30 @@ def filter_options(params, folder):
 
     STATES_PLURAL = {1: u'Новые', 2: u'Принятые', 3: u'Завершенные', 4: u'Завершенные и одобренные'}
 
-    author = assigned_to = status = ''
+    author = assigned_to = status = search_title = ''
     if params.get('status', False):
         if params['status'] in (1, 2, 3, 4):
             status = STATES_PLURAL[params['status']]
         elif params['status'] == 'all_active':
             status = u'Активные'
-        out = u"%s, "  % status
+        out = u"<i>%s</i> + " % status
 
     if params.get('author', False) and not folder == 'outbox':
         author_id = params['author']
         author = User.objects.get(pk=author_id)
         author = username(author)
-        out += u"автор: %s, "  % author
+        out += u"автор: <i>%s</i> + " % author
 
     if params.get('assigned_to', False) and not folder == 'inbox':
         assigned_to_id = params['assigned_to']
         assigned_to = User.objects.get(pk=assigned_to_id)
         assigned_to = username(assigned_to)
-        out += u"ответственный: %s"  % assigned_to
+        out += u"ответственный: <i>%s</i> + " % assigned_to
+
+    if params.get('search_title', False):
+        out += u"название: <i>&laquo;%s&raquo;</i>" % params['search_title']
   
-    p = re.compile(', $')
+    p = re.compile(' \+ $')
     out = p.sub('', out)
     if out:
         out = '<nobr>(' + out + ')</nobr>'
