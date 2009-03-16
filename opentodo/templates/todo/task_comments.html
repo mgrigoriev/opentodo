@@ -20,8 +20,8 @@ function reply_to(comment_id) {
 {% for comment in task.comments.all %}
 	<div class="comment">	
 	<div id="id_message_{{comment.id}}">{{comment.message|sanitize}}</div>
-	<div class="comment-extra">&#151; {{comment.author|username}}, {{comment.created_at|format_date}}
-	<span style="color:#777">&nbsp;<a href="javascript:reply_to({{comment.id}})" style="font-size: 10pt; color: #5555aa;" class="comment_reply">ответить</a></span>
+	<div class="comment-extra">{{comment.author|username}}, {{comment.created_at|format_date}}
+	<span style="color:#777">&nbsp;(<a href="javascript:reply_to({{comment.id}})" style="font-size: 10pt; color: #5555aa;" class="comment_reply">ответить</a>)</span>
 	{% ifequal comment.author user %}
 		{% include "todo/comment_actions.html" %}
 	{% else %}
