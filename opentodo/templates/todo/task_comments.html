@@ -1,12 +1,27 @@
 {% load todo_extras %}
 
-<h1>Комментарии</h1>
+<script type="text/javascript">
+function reply_to(comment_id) {
+	msg = '#id_message_' + comment_id;
+	text = $(msg).text();
+	var lines = text.split("\n");
+	var text_quote = '';
+	$(lines).each(function(i) {
+		text_quote += "> " + lines[i] + "\n";
+	});
+	$('#id_message_input').text(text_quote);
+//	alert(text);
+}
+</script>
+
+<h1 style="padding-top:10px">Комментарии</h1>
 {% if task.comments.all %}
 <div id="comment-container">
 {% for comment in task.comments.all %}
 	<div class="comment">	
-	{{comment.message|sanitize}}
-	<div class="comment-extra">{{comment.author|username}}, {{comment.created_at|format_date}}
+	<div id="id_message_{{comment.id}}">{{comment.message|sanitize}}</div>
+	<div class="comment-extra">&#151; {{comment.author|username}}, {{comment.created_at|format_date}}
+	<span style="color:#777">&nbsp;<a href="javascript:reply_to({{comment.id}})" style="font-size: 10pt; color: #5555aa;" class="comment_reply">ответить</a></span>
 	{% ifequal comment.author user %}
 		{% include "todo/comment_actions.html" %}
 	{% else %}
@@ -22,7 +37,7 @@
 
 <div class="editformWrapper" style="width:700px; margin-top:10px">
 <form method="post" action="{% url add_comment task.id %}" id="comment-form">
-<textarea name="message" rows="6" cols="30"></textarea><br />
+<textarea name="message" id="id_message_input" rows="10" cols="30"></textarea><br />
 <input type="submit" value="Добавить комментарий" class="button" />
 </form>
 </div>

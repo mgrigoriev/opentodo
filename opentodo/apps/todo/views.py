@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+#------------------------------------------------------------
 # opentodo (c) 2009 Mikhail Grigoriev <mgrigoriev@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
@@ -8,6 +8,7 @@
 # of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see <http://www.gnu.org/licenses/>.
+#------------------------------------------------------------
 
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseRedirect, Http404, HttpRequest, HttpResponseForbidden
@@ -127,12 +128,15 @@ def list(request, state=0):
             except ValueError:
                 pass
         # Статус
-        if params.get('status', False):
-            if params['status'] in ('1','2','3','4'):
-                params['status'] = int(params['status'])
-                tasks = tasks.filter(status__id=params['status'])
-            elif params['status'] == 'all_active':
+        if params.get('status', False):            
+            if params['status'] == 'all_active':
                 tasks = tasks.exclude(status__id=3).exclude(status__id=4)
+            try:
+                params['status'] = int(params['status'])
+                if params['status'] in (1, 2, 3, 4):
+                    tasks = tasks.filter(status__id=params['status'])
+            except ValueError:
+                pass
         # Название
         if params.get('search_title', False):
             tasks = tasks.filter(title__icontains=params['search_title'])

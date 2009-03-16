@@ -183,19 +183,25 @@ def sanitize_html(value):
             tag.hidden = True
         tag.attrs = [(attr, val) for attr, val in tag.attrs
                      if attr in valid_attrs]
-    value = soup.renderContents().decode('utf8').replace('javascript:', '')
+    from string import strip
+    value = strip( soup.renderContents().decode('utf8').replace('javascript:', '') )
     
     out = ''
     linebreaks = True
+
     for line in value.split("\n"):
         if '<pre>' in line:
             linebreaks = False
         if '</pre>' in line:
             linebreaks = True
-
+        
         if linebreaks:
             p = re.compile('^- ')
-            out += p.sub('&#151;&nbsp;', line) + "<br />\n"
+            line = p.sub('&#151;&nbsp;', line)
+            match = re.search('(^> .*)', line)
+            if match:
+                line = '<span class="comment-quote">' + match.group(0) + '</span>'
+            out += line + "<br />"
         else:
             out += line
 

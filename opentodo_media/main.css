@@ -281,14 +281,19 @@ div.top-indent {
 }
 div.comment {
 	padding-top: 0px;
-	margin-bottom:15px;
+	padding-bottom: 5px;
+	margin-bottom:20px;
 	width: 50em;
 	color: #000;
-
 }
 div.comment-extra {
-	color: #999;
+	color: #777;
+	background-color: #fff;
 	font-size: 11pt;
+	padding-top: 5px;
+}
+.comment-quote {
+	color:#009542;
 }
 div.attachments {
 	padding-bottom:20px;
