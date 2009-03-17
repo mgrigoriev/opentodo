@@ -1,6 +1,6 @@
-{% load todo_extras %}Комментарий к задаче: {{t.title}}
+{% load todo_extras %}Комментарий к задаче &laquo;{{t.title}}&raquo;:<br /><br />
 
-{{c.message}}
-написал {{c.author|username}}, {{c.created_at|date:"d.m.Y H:i"}}
+{{c.message|sanitize}}
+<b>{{c.author|username}}</b>, {{c.created_at|format_date}}<br /><br />
 
-http://{{host}}{% url task_details t.id %}#comments
+<a href="http://{{host}}{% url task_details t.id %}#comments">http://{{host}}{% url task_details t.id %}#comments</a>

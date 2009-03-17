@@ -14,11 +14,12 @@ from django.db import models
 from django.db.models import Q
 from django.contrib.auth.models import User
 
+
 # Для уведомлений по e-mail
 from django.template.loader import get_template
 from django.template import Context
 from django.conf import settings
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage
 
 # Тема письма при изменении статуса задачи
 TASK_NOTIF_SUBJECTS = {
@@ -34,6 +35,12 @@ TASK_NOTIF_SUBJECTS = {
 # Удаляет дублирующие значения из списка
 def uniqs(seq):
     return dict(zip(seq, [None,]*len(seq))).keys()
+
+# Отправка почты - обертка для EmailMessage
+def send_emails(subject, message, recipient_list):
+    msg = EmailMessage(subject, message, settings.EMAIL_ADDRESS_FROM, recipient_list)
+    msg.content_subtype = "html"
+    msg.send(fail_silently=settings.EMAIL_FAIL_SILENTLY)
 
 # Генерирует upload path для FileField
 def make_upload_path(instance, filename):
@@ -143,7 +150,7 @@ class Task(models.Model):
                 addr = self.author.email
         
             if addr:
-                send_mail('[opentodo]'+TASK_NOTIF_SUBJECTS[notif_id], msg_body, settings.EMAIL_ADDRESS_FROM, [addr], fail_silently=settings.EMAIL_FAIL_SILENTLY)
+                send_emails('[opentodo] '+TASK_NOTIF_SUBJECTS[notif_id], msg_body, [addr])
         
 # Комментарии к задачам
 class Comment(models.Model):
@@ -168,7 +175,7 @@ class Comment(models.Model):
             if self.reply_to and self.reply_to.author.email:
                 addrs.append(self.reply_to.author.email)
             if addrs:
-                send_mail('[opentodo] Комментарий к задаче', msg_body, settings.EMAIL_ADDRESS_FROM, uniqs(addrs), fail_silently=settings.EMAIL_FAIL_SILENTLY)
+                send_emails('[opentodo] Комментарий к задаче', msg_body, uniqs(addrs))
 
 # Абстрактный класс для файлов-вложений
 class CommonAttach(models.Model):
@@ -198,4 +205,4 @@ class TaskAttach(CommonAttach):
                 addrs.append(self.task.assigned_to.email)
             
             if addrs:
-                send_mail('[opentodo] Файл прикреплен к задаче', msg_body, settings.EMAIL_ADDRESS_FROM, uniqs(addrs), fail_silently=settings.EMAIL_FAIL_SILENTLY)
+                send_emails('[opentodo] Файл прикреплен к задаче', msg_body, uniqs(addrs))

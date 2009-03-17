@@ -1,5 +1,5 @@
-{% load todo_extras %}Задача: {{t.title}}
+{% load todo_extras %}К задаче &laquo;{{t.title}}&raquo; прикреплен файл:<br /><br />
 
-Файл: {{a.attached_file.name|attach}}
+<b>{{a.attached_file.name|attach}}</b><br /><br />
 
-http://{{host}}{% url task_details t.id %}#files
+<a href="http://{{host}}{% url task_details t.id %}#files">http://{{host}}{% url task_details t.id %}#files</a>
