@@ -145,7 +145,6 @@ class Task(models.Model):
             if addr:
                 send_mail('[opentodo]'+TASK_NOTIF_SUBJECTS[notif_id], msg_body, settings.EMAIL_ADDRESS_FROM, [addr], fail_silently=settings.EMAIL_FAIL_SILENTLY)
         
-
 # Комментарии к задачам
 class Comment(models.Model):
     task = models.ForeignKey(Task, related_name="comments")
