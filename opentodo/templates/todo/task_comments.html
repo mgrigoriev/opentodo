@@ -45,7 +45,7 @@ function reply_to(comment_id) {
 <div class="editformWrapper" style="width:700px; margin-top:10px">
 <form method="post" action="{% url add_comment task.id %}" id="comment-form">
 <input type="hidden" name="reply_to" id="reply_to" value="" />
-<textarea name="message" id="id_message_input" rows="10" cols="30"></textarea><br />
+<textarea name="message" id="id_message_input" rows="8" cols="30"></textarea><br />
 <input type="submit" value="Добавить комментарий" class="button" />
 </form>
 </div>
