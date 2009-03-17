@@ -2,15 +2,19 @@
 
 <script type="text/javascript">
 function reply_to(comment_id) {
-	msg = '#id_message_' + comment_id;
-	text = $(msg).text();
+	var msg = '#id_message_' + comment_id;
+	var author = '#id_author_' + comment_id;
+	var dt = '#id_dt_' + comment_id;
+	var text = $(msg).text();
 	var lines = text.split("\n");
 	var text_quote = '';
 	$(lines).each(function(i) {
 		text_quote += "> " + lines[i] + "\n";
 	});
+	text_quote = "> " + $(author).text() + " (" + $(dt).text() + "):\n" + text_quote;
+	$('#id_message_input').focus();
 	$('#id_message_input').text(text_quote);
-//	alert(text);
+	$('#reply_to').val(comment_id);
 }
 </script>
 
@@ -20,8 +24,10 @@ function reply_to(comment_id) {
 {% for comment in task.comments.all %}
 	<div class="comment">	
 	<div id="id_message_{{comment.id}}">{{comment.message|sanitize}}</div>
-	<div class="comment-extra">{{comment.author|username}}, {{comment.created_at|format_date}}
-	<span style="color:#777">&nbsp;(<a href="javascript:reply_to({{comment.id}})" style="font-size: 10pt; color: #5555aa;" class="comment_reply">ответить</a>)</span>
+	<div class="comment-extra">
+		<span id="id_author_{{comment.id}}">{{comment.author|username}}</span>,
+		<span id="id_dt_{{comment.id}}">{{comment.created_at|format_date}}</span>
+		<span style="color:#777">&nbsp;(<a href="#comment_form" onclick="reply_to({{comment.id}})" style="font-size: 10pt; color: #5555aa;" class="comment_reply">ответить</a>)</span>
 	{% ifequal comment.author user %}
 		{% include "todo/comment_actions.html" %}
 	{% else %}
@@ -35,8 +41,10 @@ function reply_to(comment_id) {
 </div>
 {% endif %}
 
+<a name="comment_form"></a>
 <div class="editformWrapper" style="width:700px; margin-top:10px">
 <form method="post" action="{% url add_comment task.id %}" id="comment-form">
+<input type="hidden" name="reply_to" id="reply_to" value="" />
 <textarea name="message" id="id_message_input" rows="10" cols="30"></textarea><br />
 <input type="submit" value="Добавить комментарий" class="button" />
 </form>

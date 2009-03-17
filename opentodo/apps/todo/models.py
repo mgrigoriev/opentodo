@@ -152,6 +152,7 @@ class Comment(models.Model):
     author = models.ForeignKey(User)
     message = models.TextField("Комментарий")
     created_at = models.DateTimeField("Дата", auto_now_add=True)
+    reply_to = models.ForeignKey('self', null=True, blank=True)
     class Meta:
         ordering = ['created_at']
 
@@ -165,7 +166,9 @@ class Comment(models.Model):
                 addrs.append(self.task.author.email)
             if self.task.assigned_to and self.task.assigned_to.email:
                 addrs.append(self.task.assigned_to.email)
-            if addrs:                
+            if self.reply_to and self.reply_to.author.email:
+                addrs.append(self.reply_to.author.email)
+            if addrs:
                 send_mail('[opentodo] Комментарий к задаче', msg_body, settings.EMAIL_ADDRESS_FROM, uniqs(addrs), fail_silently=settings.EMAIL_FAIL_SILENTLY)
 
 # Абстрактный класс для файлов-вложений

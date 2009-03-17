@@ -514,7 +514,7 @@ def task_to_new(request, task_id):
 # Добавление комментария к задаче
 # Доступ: участники проекта
 @login_required
-def add_comment(request, task_id):    
+def add_comment(request, task_id):
     if request.method == 'POST' and request.POST.get('message', '') != '':
         task = get_object_or_404(Task, pk=task_id)
 
@@ -523,6 +523,15 @@ def add_comment(request, task_id):
 
         message = request.POST.get('message', '')
         comment = Comment(author=request.user, task=task, message=message)
+        if request.POST.get('reply_to', False):
+            try:
+                reply_to_id = int(request.POST['reply_to'])
+                try:
+                    comment.reply_to = Comment.objects.get(pk=reply_to_id)
+                except Comment.DoesNotExist:
+                    pass
+            except ValueError:
+                pass
         comment.save()
         comment.mail_notify(request.get_host())
 
