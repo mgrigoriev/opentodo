@@ -1,6 +1,7 @@
 {% load todo_extras %}
 
 <script type="text/javascript">
+/*
 function reply_to(comment_id) {
 	var msg = '#id_message_' + comment_id;
 	var author = '#id_author_' + comment_id;
@@ -16,18 +17,46 @@ function reply_to(comment_id) {
 	$('#id_message_input').text(text_quote);
 	$('#reply_to').val(comment_id);
 }
+*/
+
+$(document).ready(function() {
+	$('#id_show_comment_form').click(function() {
+		$(this).hide();
+		$('.reply_to').remove();		
+		$('.reply_all').show();
+		$('textarea').click();
+	});
+});
+
+function reply_to_new(comment_id) {
+	var reply_form = $('.reply_all');
+	var comment_block = '#id_comment_' + comment_id;
+	var author = '#id_author_' + comment_id;
+	var text = '';
+	text = $(author).text() + ': ';
+
+	$('.reply_to').remove();
+	$(comment_block).append('<div class="reply_to">' + reply_form.html() + '</div>');
+	$('.reply_to').find('textarea').focus();
+	$('.reply_to').find('textarea').text(text);
+	$('.reply_to').find('span').html('для цитат используйте символ <big><b>&gt;</b></big> в начале строки');
+	$('.reply_to').find(':submit').val('  Ответить  ');
+
+	reply_form.hide();
+	$('#id_show_comment_form').show();
+}
 </script>
 
 <h1 style="padding-top:10px">Комментарии</h1>
 {% if task.comments.all %}
 <div id="comment-container">
 {% for comment in task.comments.all %}
-	<div class="comment">	
+	<div class="comment" id="id_comment_{{comment.id}}">	
 	<div id="id_message_{{comment.id}}">{{comment.message|sanitize}}</div>
 	<div class="comment-extra">
 		<span id="id_author_{{comment.id}}">{{comment.author|username}}</span>,
 		<span id="id_dt_{{comment.id}}">{{comment.created_at|format_date}}</span>
-		<span style="color:#777">&nbsp;(<a href="#comment_form" onclick="reply_to({{comment.id}})" style="font-size: 10pt; color: #5555aa;" class="comment_reply">ответить</a>)</span>
+		<span style="color:#777">&nbsp;(<a href="javascript:reply_to_new({{comment.id}});" style="font-size: 10pt; color: #5555aa;" class="comment_reply">ответить</a>)</span>
 	{% ifequal comment.author user %}
 		{% include "todo/comment_actions.html" %}
 	{% else %}
@@ -41,13 +70,17 @@ function reply_to(comment_id) {
 </div>
 {% endif %}
 
+<a href="#comment_form" style="font-size:130%; color:#999; text-decoration:none; border-bottom:1px dashed #999; display: none" id="id_show_comment_form">Написать комментарий</a>
 <a name="comment_form"></a>
-<div class="editformWrapper" style="width:700px; margin-top:10px">
-<form method="post" action="{% url add_comment task.id %}" id="comment-form">
-<input type="hidden" name="reply_to" id="reply_to" value="" />
-<textarea name="message" id="id_message_input" rows="8" cols="30"></textarea><br />
-<input type="submit" value="Добавить комментарий" class="button" />
-</form>
+<div class="reply_all">
+	<div class="editformWrapper" style="width:700px; margin-top:10px">
+		<form method="post" action="{% url add_comment task.id %}">
+			<input type="hidden" name="reply_to" value="" />
+			<textarea name="message" rows="7" cols="30" style="width:700px"></textarea><br />
+			<input type="submit" value="Добавить комментарий" class="button" />
+			<span style="color: #aaa; font-size: 10pt"><!-- text here, use in jquery --></span>
+		</form>
+	</div>
 </div>
 
 {% include "todo/allowed_htmltags.html" %}
