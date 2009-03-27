@@ -198,7 +198,7 @@ def sanitize_html(value):
         if linebreaks:
             p = re.compile('^- ')
             line = p.sub('&#151;&nbsp;', line)
-            match = re.search('(^> .*)', line)
+            match = re.search('(^>.*)', line)
             if match:
                 line = '<span class="comment-quote">' + match.group(0) + '</span>'
             out += line + "<br />"
