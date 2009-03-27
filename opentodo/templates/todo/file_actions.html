@@ -1,7 +1,7 @@
 {% load todo_extras %}
 
 {% ifequal menu_active 'tasks' %}
-<a href="javascript:if(confirm('Удалить файл {{a.attached_file.path|attach}}?')) location.href='{% url delete_task_attach a.id %}'" style="color:red;font-weight:normal"><img src="{{MEDIA_URL}}/img/cross_small.gif" alt="" width="16" height="16" title="удалить" /></a>
+<a href="javascript:if(confirm('Удалить файл {{a.attached_file.path|attach}}?')) location.href='{% url delete_task_attach a.id %}'" style="color:red;font-weight:normal"><img src="{{MEDIA_URL}}img/cross_small.gif" alt="" width="16" height="16" title="удалить" /></a>
 {% else %}{% ifequal menu_active 'projects' %}
-<a href="javascript:if(confirm('Удалить файл {{a.attached_file.path|attach}}?')) location.href='{% url delete_project_attach a.id %}'" style="color:red;font-weight:normal"><img src="{{MEDIA_URL}}/img/cross_small.gif" alt="" width="16" height="16" title="удалить" /></a>
+<a href="javascript:if(confirm('Удалить файл {{a.attached_file.path|attach}}?')) location.href='{% url delete_project_attach a.id %}'" style="color:red;font-weight:normal"><img src="{{MEDIA_URL}}img/cross_small.gif" alt="" width="16" height="16" title="удалить" /></a>
 {% endifequal %}{% endifequal %}

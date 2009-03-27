@@ -92,7 +92,7 @@ $(document).ready(function(){
 {% for t in tasks %}
 	<tr{% ifequal t.status.id 3 %} class="grey"{% endifequal %}{% ifequal t.status.id 4 %} class="grey"{% endifequal %}>
 
-		<td class="left"><a href="{% url task_details t.id %}" class="todolist">{{t.title}}</a>&nbsp;{% if t.comments.count %}<a href="{% url task_details t.id %}#comments" class="comment">({{ t.comments.count }})</a>{% endif %}&nbsp;&nbsp;{% if t.files.count %}<a href="{% url task_details t.id %}#files"><img src="{{MEDIA_URL}}/img/attach.gif" style="vertical-align:middle;border:0" /></a>{% endif %}</td>
+		<td class="left"><a href="{% url task_details t.id %}" class="todolist">{{t.title}}</a>&nbsp;{% if t.comments.count %}<a href="{% url task_details t.id %}#comments" class="comment">({{ t.comments.count }})</a>{% endif %}&nbsp;&nbsp;{% if t.files.count %}<a href="{% url task_details t.id %}#files"><img src="{{MEDIA_URL}}img/attach.gif" style="vertical-align:middle;border:0" /></a>{% endif %}</td>
 		{% if not project %}<td><nobr>{{t.project.title}}</nobr></td>{% endif %}
 		<td><nobr>{{t.author|username}}</nobr></td>
 		<td style="text-align:right">{{t.created_at|format_date:"short"}}</td>

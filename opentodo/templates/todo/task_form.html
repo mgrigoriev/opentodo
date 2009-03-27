@@ -3,7 +3,7 @@
 $(document).ready(function(){
 	load_users();
 
-	$('#id_deadline').attachDatepicker({showOn:'both', buttonImage:'{{MEDIA_URL}}/img/calendar.gif', buttonImageOnly:true});
+	$('#id_deadline').attachDatepicker({showOn:'both', buttonImage:'{{MEDIA_URL}}img/calendar.gif', buttonImageOnly:true});
 
 	$("#id_project").attr("required", "true");
 	$("#id_title").attr("required", "true");
@@ -74,7 +74,7 @@ function load_users() {
 	{% for u in users %}
 		<option value="{{u.id}}"{% if add %}{% ifequal u.id user.id %} selected="selected"{% endifequal %}{% else %}{% ifequal u.id task.assigned_to.id %} selected="selected"{% endifequal %}{% endif %}>{{u|username}}</option> 
 	{% endfor %}
-		</select><img src="{{MEDIA_URL}}/img/ajax-loader.gif" id="loader" style="padding-left:5px; display:none" />
+		</select><img src="{{MEDIA_URL}}img/ajax-loader.gif" id="loader" style="padding-left:5px; display:none" />
 	</div>
 	<div class="fieldWrapper fieldWrapperIndent">
 		<label>&nbsp;</label><input type="submit" value="Сохранить задачу" class="button" /><a href="{% if add %}{% url tasks_list %}{% else %}{% url task_details task.id %}{% endif %}">отмена</a>

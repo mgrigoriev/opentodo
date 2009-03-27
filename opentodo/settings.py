@@ -66,7 +66,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.doc.XViewMiddleware',
-#   'todo.middleware.StripWhitespaceMiddleware',
     'todo.middleware.Custom403Middleware',
 )
 FILE_CHARSET = 'utf-8'
@@ -78,7 +77,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.debug',
     'django.core.context_processors.i18n',
     'django.core.context_processors.media',
-    'context_processors.host'
+    'context_processors.host',
+    'context_processors.my_media_url',
 )
 
 AUTHENTICATION_BACKENDS = (
