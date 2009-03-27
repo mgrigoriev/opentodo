@@ -87,9 +87,6 @@ a.todolist, a.todolist:visited {
 	font-weight:bold;
 	text-decoration: none;
 }
-a.todolist:hover {
-	border-bottom: 2px solid #ddd;
-}
 a.do, a.do:visited {
 	font-weight:normal;
 	text-decoration:none;
