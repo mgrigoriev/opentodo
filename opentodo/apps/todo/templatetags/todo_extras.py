@@ -5,7 +5,6 @@ import re
 from django.contrib.auth.models import User
 from todo.models import Status
 from django.utils.safestring import mark_safe
-from BeautifulSoup import BeautifulSoup, Comment
 from django import template
 
 register = template.Library()
@@ -167,42 +166,61 @@ def filter_options(params, folder):
 
 
 """
-    Удаление html-тегов из текста за исключением разрешенных;
-    расстановка <br /> в конце строк (за исключением текста внутри <pre>);
+    Замена '<' и '>' на '&lt;' и '&gt;' в html-тегах за исключением разрешенных;
+    расстановка <br /> в конце строк за исключением текста внутри <pre>;
     форматирование списков: "- " в начале строки заменяется на тире.
+
+    Разрешено: <a href="">, <b>, <i>, <pre> (для вставки кода)
 """
 def sanitize_html(value):
-    valid_tags = 'b i a pre br'.split()
-    valid_attrs = 'href src'.split()
-    soup = BeautifulSoup(value)
-    for comment in soup.findAll(
-        text=lambda text: isinstance(text, Comment)):
-        comment.extract()
-    for tag in soup.findAll(True):
-        if tag.name not in valid_tags:
-            tag.hidden = True
-        tag.attrs = [(attr, val) for attr, val in tag.attrs
-                     if attr in valid_attrs]
-    from string import strip
-    value = strip( soup.renderContents().decode('utf8').replace('javascript:', '') )
-    
     out = ''
     linebreaks = True
+    lt = '&lt;'
+    gt = '&gt;'
+
+    value = re.sub('<', lt, value)
+    value = re.sub('>', gt, value)
+
+    # Сформировать теги по найденным совпадениям
+    def href_subber(match):
+        if re.search('javascript', match.group(2)):
+            return '<a href="#">%s</a>' % (match.group(4))
+        return '<a href="%s">%s</a>' % (match.group(2), match.group(4))
+    def tag_subber(match):
+        return '<%s>%s</%s>' % (match.group(1), match.group(2), match.group(1))
+
+    # Ссылки
+    href_re = re.compile(lt + '(a +href=")([^"]+)(" ?' + gt + ')' + '(.+)' + lt + '/a' + gt, re.I)
+    value = href_re.sub(href_subber, value)
+
+    # Другие разрешенные теги.
+    # Регистр игнорируется, а в тег pre может быть заключено несколько строк.
+    for tag in ('b', 'i', 'pre'):
+        opt = re.I
+        if tag == 'pre':
+            opt =  re.I | re.S
+        tag_re = re.compile(lt + '(' + tag + ')' + gt + '(.*)' + lt + '/' + tag + gt, opt)
+        value = tag_re.sub(tag_subber, value)
 
     for line in value.split("\n"):
-        if '<pre>' in line:
-            linebreaks = False
-        if '</pre>' in line:
-            linebreaks = True
+        if '<pre>' in line: linebreaks = False
+        if '</pre>' in line: linebreaks = True
         
         if linebreaks:
-            p = re.compile('^- ')
-            line = p.sub('&#151;&nbsp;', line)
-            match = re.search('(^>.*)', line)
+            # В списках заменяем минус на тире
+            line = re.sub('^- ', '&#151;&nbsp;', line)
+
+            # Выделяем цветом цитаты (если есть '>' в начале строки)
+            match = re.search('(^' + gt + '.*)', line)
             if match:
                 line = '<span class="comment-quote">' + match.group(0) + '</span>'
             out += line + "<br />"
         else:
+            # внутри тега pre заменяем угловые скобки на коды
+            # это было сделано вначале, но затем была вставка разрешенных тегов, а они тут не нужны
+            line = re.sub('<', lt, line)
+            line = re.sub('>', gt, line)
+            line = re.sub(lt + 'pre' + gt, '<pre>', line)
             out += line
 
     return mark_safe(out)

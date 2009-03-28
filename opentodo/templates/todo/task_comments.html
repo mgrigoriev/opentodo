@@ -1,23 +1,6 @@
 {% load todo_extras %}
 
 <script type="text/javascript">
-/*
-function reply_to(comment_id) {
-	var msg = '#id_message_' + comment_id;
-	var author = '#id_author_' + comment_id;
-	var dt = '#id_dt_' + comment_id;
-	var text = $(msg).text();
-	var lines = text.split("\n");
-	var text_quote = '';
-	$(lines).each(function(i) {
-		text_quote += "> " + lines[i] + "\n";
-	});
-	text_quote = "> " + $(author).text() + " (" + $(dt).text() + "):\n" + text_quote;
-	$('#id_message_input').focus();
-	$('#id_message_input').text(text_quote);
-	$('#reply_to').val(comment_id);
-}
-*/
 
 $(document).ready(function() {
 	$('#id_show_comment_form').click(function() {
@@ -39,6 +22,7 @@ function reply_to_new(comment_id) {
 	$(comment_block).append('<div class="reply_to">' + reply_form.html() + '</div>');
 	$('.reply_to').find('textarea').focus();
 	$('.reply_to').find('textarea').text(text);
+	$('.reply_to').find('input:hidden').val(comment_id);
 	$('.reply_to').find('span').html('для цитат используйте символ <big><b>&gt;</b></big> в начале строки');
 	$('.reply_to').find(':submit').val('  Ответить  ');
 
