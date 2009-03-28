@@ -44,14 +44,20 @@ $(document).ready(function(){
 
 	// Make TR clickable
 	// Thanks, man :-)
-	$('<style>tr.hover td{background-color:#e6edf1;}</style>').prependTo('body');
-	$('#task-list table.common tr').css({cursor:'pointer'})
+	$('<style>table.common tr.hover td{background-color:#e6edf1;}</style>').prependTo('body');
+	$('#task-list table.common tr')
 	 .click(function(){
-	  window.location.href=
-	   $(this).find('a.todolist').attr('href');
+		if ($(this).find('a.todolist').attr('href')) {
+			window.location.href = $(this).find('a.todolist').attr('href');
+		}  
 	  }
 	 ).hover(
-	  function(){$(this).addClass('hover')},
+	  function(){
+		if ($(this).find('a.todolist').attr('href')) {
+			$(this).addClass('hover');
+			$(this).css({cursor:'pointer'});
+		}
+	  },
 	  function(){$(this).removeClass('hover')}
 	);
 
