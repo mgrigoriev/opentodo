@@ -190,7 +190,7 @@ def sanitize_html(value):
         return '<%s>%s</%s>' % (match.group(1), match.group(2), match.group(1))
 
     # Ссылки
-    href_re = re.compile(lt + '(a +href=")([^"]+)(" ?' + gt + ')' + '(.+)' + lt + '/a' + gt, re.I)
+    href_re = re.compile(lt + '(a +href=")([^"]+)(" ?' + gt + ')' + '(.+?)' + lt + '/a' + gt, re.I)
     value = href_re.sub(href_subber, value)
 
     # Другие разрешенные теги.
@@ -199,7 +199,7 @@ def sanitize_html(value):
         opt = re.I
         if tag == 'pre':
             opt =  re.I | re.S
-        tag_re = re.compile(lt + '(' + tag + ')' + gt + '(.*)' + lt + '/' + tag + gt, opt)
+        tag_re = re.compile(lt + '(' + tag + ')' + gt + '(.*?)' + lt + '/' + tag + gt, opt)
         value = tag_re.sub(tag_subber, value)
 
     for line in value.split("\n"):
