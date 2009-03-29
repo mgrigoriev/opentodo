@@ -10,7 +10,9 @@ fieldset {
 }
 input, textarea, select {
 	font-family: Arial;
-
+}
+input, textarea {
+	padding-left: 1px;
 }
 .button {
  font-weight: normal;
@@ -25,32 +27,34 @@ input, textarea, select {
 	background-color: #FFECE6;
 }
 div.editformWrapper {
-	background-color: #f2f2f2; /*#f0efe4;#d4edc9;*/
+	background-color: #f2f2f2;
 	border: 3px solid #e9e9e9;
 	padding: 20px;
 }
-#editform div.fieldWrapper {
-	padding-bottom: 5px;
+table#editform_table td {
+	padding: 3px;
+	padding-left: 7px;
+	vertical-align: top;
 }
-#editform div.fieldWrapperIndent {
-	padding-top: 10px;
-}
-#editform label {
-	float: left;
-	padding: 0 10px;
+table#editform_table th {
 	text-align: right;
+	font-weight: normal;
+	vertical-align: top;
+	padding-top: 3px;
+	width: 140px;
+}
+
+#editform label {
 	width: 130px;
 	color: #333;
 	font-size:10pt;
 }
-#editform br {
-	clear: left;
-}
-#editform textarea, #projectform textarea {
+
+#editform textarea {
 	width: 600px;
 	height: 200px;
 }
-#editform #id_title, #projectform #id_title {
+#editform #id_title {
 	width: 600px;
 	height: 35px;
 }

@@ -23,7 +23,6 @@ $(document).ready(function(){
 function load_users() {
 	$.getJSON("{% url json_project_users %}",{id: $('#id_project :selected').val(), ajax: 'true'}, function(j){
 		$("#loader").show();
-//		$('#id_assigned_to').attr("disabled", true); 
 
 		selected_id = {% if add %}{{user.id}}{% else %}{{task.assigned_to.id}}{% endif %}
 
@@ -37,7 +36,6 @@ function load_users() {
 		}
 		$("select#id_assigned_to").html(options);
 		setTimeout(function() { $("#loader").hide(); }, 300);
-//		setTimeout(function() { $("#loader").hide(); $('#id_assigned_to').removeAttr("disabled"); }, 300);
 	})
 }
 </script>
@@ -48,41 +46,45 @@ function load_users() {
 	{% if form.deadline.errors %}Формат даты в поле Срок должен быть yyyy-mm-dd<br />{% endif %}
 </div>
 
-
-<div class="editformWrapper" style="width:780px">
+<div class="editformWrapper" style="width:780px;">
 <form method="post" id="editform">
-	<div class="fieldWrapper">
-		<label for="id_project"><span class="red">*</span> Проект:</label>
-		{{form.project}}
-	</div>
-	<div class="fieldWrapper">
-		<label for="id_title"><span class="red">*</span> Задача:</label>
-		{{form.title}}
-	</div>
-	<div class="fieldWrapper">
-		<label for="id_info">Описание:</label>
-		{{form.info}}
-	</div>
-	<div class="fieldWrapper">
-		<label for="id_deadline">Срок:</label>
-		{{form.deadline}}
-	</div>
-	<div class="fieldWrapper">
-		<label for="id_assigned_to">Ответственный:</label>
+	<table id="editform_table" cellspacing="0">
+	<tr>
+		<th><label for="id_project"><span class="red">*</span> Проект:</label></th>
+		<td>{{form.project}}</td>
+	</tr>
+	<tr>
+		<th><label for="id_title"><span class="red">*</span> Задача:</label></th>
+		<td>{{form.title}}</td>
+	</tr>
+	<tr>
+		<th style="padding-top: 30px"><label for="id_info">Описание:</label></th>
+		<td>
+		{% include "todo/wysiwyg.html" %}
+		{{form.info}}</td>
+	</tr>
+	<tr>
+		<th><label for="id_deadline">Срок:</label></th>
+		<td>{{form.deadline}}</td>
+	</tr>
+	<tr>
+		<th><label for="id_assigned_to">Ответственный:</label></th>
+		<td>
 		<select name="assigned_to" id="id_assigned_to"> 
 		<option value="" selected="selected">---------</option>
 	{% for u in users %}
 		<option value="{{u.id}}"{% if add %}{% ifequal u.id user.id %} selected="selected"{% endifequal %}{% else %}{% ifequal u.id task.assigned_to.id %} selected="selected"{% endifequal %}{% endif %}>{{u|username}}</option> 
 	{% endfor %}
 		</select><img src="{{MEDIA_URL}}img/ajax-loader.gif" id="loader" style="padding-left:5px; display:none" />
-	</div>
-	<div class="fieldWrapper fieldWrapperIndent">
-		<label>&nbsp;</label><input type="submit" value="Сохранить задачу" class="button" /><a href="{% if add %}{% url tasks_list %}{% else %}{% url task_details task.id %}{% endif %}">отмена</a>
-	</div>
+		</td>
+	</tr>
+	<tr>
+		<th>&nbsp;</th>
+		<td style="padding-top:15px"><input type="submit" value="Сохранить задачу" class="button" /><a href="{% if add %}{% url tasks_list %}{% else %}{% url task_details task.id %}{% endif %}">отмена</a></td>
+	</tr>
+	</table>
 </form>
 </div>
-
-{% include "todo/allowed_htmltags.html" %}
 
 {% if add %}
 <script language="javascript">

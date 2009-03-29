@@ -24,10 +24,10 @@ function reply_to_new(comment_id) {
 	var text = '';
 	text = $(author).text() + ': ';
 
-	extra_text = '<a href="javascript:cancel_comment();" class="cancel_comment" style="color: #5555aa;">отмена</a><div style="display:inline; padding-left: 230px">для цитат используйте символ <big><b>&gt;</b></big> в начале строки</div>';
+	extra_text = '<a href="javascript:cancel_comment();" class="cancel_comment" style="color: #555;">отмена</a><div style="display:inline; padding-left: 200px">для цитат используйте символ <big><b>&gt;</b></big> в начале строки</div>';
 
 	$('.reply_to').remove();
-	$(comment_block).append('<div class="reply_to" style="margin-left:5px">' + reply_form.html() + '</div>');
+	$(comment_block).append('<div class="reply_to" style="margin-left:10px">' + reply_form.html() + '</div>');
 	$('.reply_to').find('textarea').focus();
 	$('.reply_to').find('textarea').text(text);
 	$('.reply_to').find('input:hidden').val(comment_id);
@@ -65,16 +65,15 @@ function reply_to_new(comment_id) {
 <a href="#comment_form" style="font-size:130%; color:#999; text-decoration:none; border-bottom:1px dashed #999; display: none" id="id_show_comment_form">Написать комментарий</a>
 <a name="comment_form"></a>
 <div class="reply_all">
-	<div class="editformWrapper" style="width:700px; margin-top:10px">
+	<div class="editformWrapper" style="width:700px; margin-top:10px; padding-top:7px">
+		{% include "todo/wysiwyg.html" %}
 		<form method="post" action="{% url add_comment task.id %}">
 			<input type="hidden" name="reply_to" value="" />
-			<textarea name="message" rows="7" cols="30" style="width:700px"></textarea><br />
+			<textarea name="message" rows="7" cols="30" style="width:700px" id="id_msg_input"></textarea><br />
 			<input type="submit" value="Добавить комментарий" class="button" />
 			<span style="color: #aaa; font-size: 10pt"><!-- text here, use in jquery --></span>
 		</form>
 	</div>
 </div>
-
-{% include "todo/allowed_htmltags.html" %}
 
 <br />
