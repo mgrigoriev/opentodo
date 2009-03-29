@@ -11,6 +11,12 @@ $(document).ready(function() {
 	});
 });
 
+function cancel_comment() {
+	$('#id_show_comment_form').hide();
+	$('.reply_to').remove();		
+	$('.reply_all').show();	
+}
+
 function reply_to_new(comment_id) {
 	var reply_form = $('.reply_all');
 	var comment_block = '#id_comment_' + comment_id;
@@ -18,12 +24,14 @@ function reply_to_new(comment_id) {
 	var text = '';
 	text = $(author).text() + ': ';
 
+	extra_text = '<a href="javascript:cancel_comment();" class="cancel_comment" style="color: #5555aa;">отмена</a><div style="display:inline; padding-left: 230px">для цитат используйте символ <big><b>&gt;</b></big> в начале строки</div>';
+
 	$('.reply_to').remove();
-	$(comment_block).append('<div class="reply_to">' + reply_form.html() + '</div>');
+	$(comment_block).append('<div class="reply_to" style="margin-left:5px">' + reply_form.html() + '</div>');
 	$('.reply_to').find('textarea').focus();
 	$('.reply_to').find('textarea').text(text);
 	$('.reply_to').find('input:hidden').val(comment_id);
-	$('.reply_to').find('span').html('для цитат используйте символ <big><b>&gt;</b></big> в начале строки');
+	$('.reply_to').find('span').html(extra_text);
 	$('.reply_to').find(':submit').val('  Ответить  ');
 
 	reply_form.hide();

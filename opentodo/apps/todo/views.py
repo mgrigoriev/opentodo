@@ -535,7 +535,7 @@ def add_comment(request, task_id):
         comment.save()
         comment.mail_notify(request.get_host())
 
-    return HttpResponseRedirect(reverse('task_details', args=(task_id,)))
+    return HttpResponseRedirect(reverse('task_details', args=(task_id,)) + '#comment_form')
 
 # Удаление комментария к задаче
 # Доступ: автор комментария
