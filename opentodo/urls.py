@@ -11,6 +11,11 @@ urlpatterns = patterns('',
     (r'^admin/(.*)', admin.site.root),
 )
 
+# serve static
+urlpatterns += patterns('',
+    (r'^static/(.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
+)
+
 urlpatterns += patterns('todo.views',
     url(r'^tasks/$', 'list', name='tasks_list'),
     url(r'^tasks/new/$', 'add_task', name='add_task'),
