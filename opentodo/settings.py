@@ -8,12 +8,16 @@
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-DATABASE_ENGINE = 'mysql'        # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'ado_mssql'.
-DATABASE_NAME = 'opentodo'       # Or path to database file if using sqlite3.
-DATABASE_USER = ''               # Not used with sqlite3.
-DATABASE_PASSWORD = ''           # Not used with sqlite3.
-DATABASE_HOST = ''               # Set to empty string for localhost. Not used with sqlite3.
-DATABASE_PORT = ''               # Set to empty string for default. Not used with sqlite3.
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',        # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'ado_mssql'.
+        'NAME': 'opentodo.db',       # Or path to database file if using sqlite3.
+        'USER': '',               # Not used with sqlite3.
+        'PASSWORD': '',           # Not used with sqlite3.
+        'HOST': '',               # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '',               # Set to empty string for default. Not used with sqlite3.
+    }
+}
 
 # Absolute path to the directory that holds media.
 # MEDIA_ROOT = '/var/www/opentodo_media'
@@ -23,6 +27,31 @@ MEDIA_ROOT = ''
 # Note that this should have a trailing slash if it has a path component
 # MEDIA_URL = 'http://static.myhost.ru' or MEDIA_URL = 'http://myhost.ru/static/'
 MEDIA_URL = ''
+
+# Absolute path to the directory static files should be collected to.
+# Don't put anything in this directory yourself; store your static files
+# in apps' "static/" subdirectories and in STATICFILES_DIRS.
+# Example: "/home/media/media.lawrence.com/static/"
+STATIC_ROOT = ''
+
+# URL prefix for static files.
+# Example: "http://media.lawrence.com/static/"
+STATIC_URL = '/static/'
+
+# Additional locations of static files
+STATICFILES_DIRS = (
+    # Put strings here, like "/home/html/static" or "C:/www/django/static".
+    # Always use forward slashes, even on Windows.
+    # Don't forget to use absolute paths, not relative paths.
+)
+
+# List of finder classes that know how to find static files in
+# various locations.
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+)
 
 SEND_EMAILS = False       # make it True and edit settings bellow if you want to receive emails
 EMAIL_HOST = ''           # smtp.myhost.com
@@ -57,8 +86,8 @@ USE_I18N = True
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.load_template_source',
-    'django.template.loaders.app_directories.load_template_source',
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -73,10 +102,11 @@ FILE_CHARSET = 'utf-8'
 SESSION_SAVE_EVERY_REQUEST = False
 
 TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.core.context_processors.auth',
+    'django.contrib.auth.context_processors.auth',
     'django.core.context_processors.debug',
     'django.core.context_processors.i18n',
     'django.core.context_processors.media',
+    'django.core.context_processors.request',
     'context_processors.host',
     'context_processors.my_media_url',
 )

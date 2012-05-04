@@ -56,6 +56,7 @@ function setFocus() {
 		<div class="error">Неправильный логин или пароль</div>
 		{% endif %}
 		<form method="post" action="." id="id_loginform">
+		{% csrf_token %}
 		<table>
 		<tr><td></td><td class="logo"><span style="padding-right: 2px;">open</span><b>todo</b></td></tr>
 		<tr><td><label for="id_username">Логин:</label></td><td>{{ form.username }}</td></tr>

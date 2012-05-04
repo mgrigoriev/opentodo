@@ -1,23 +1,30 @@
 # -*- coding: utf-8 -*-
+from os.path import join, dirname, abspath
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-DATABASE_ENGINE = 'mysql'        # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'ado_mssql'.
-DATABASE_NAME = 'opentodo'       # Or path to database file if using sqlite3.
-DATABASE_USER = ''               # Not used with sqlite3.
-DATABASE_PASSWORD = ''           # Not used with sqlite3.
-DATABASE_HOST = ''               # Set to empty string for localhost. Not used with sqlite3.
-DATABASE_PORT = ''               # Set to empty string for default. Not used with sqlite3.
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',        # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'ado_mssql'.
+        'NAME': 'opentodo.db',       # Or path to database file if using sqlite3.
+        'USER': '',               # Not used with sqlite3.
+        'PASSWORD': '',           # Not used with sqlite3.
+        'HOST': '',               # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '',               # Set to empty string for default. Not used with sqlite3.
+    }
+}
 
 # Absolute path to the directory that holds media.
 # MEDIA_ROOT = '/var/www/opentodo_media'
-MEDIA_ROOT = ''
+# MEDIA_ROOT = ''
+MEDIA_ROOT = abspath(join(dirname(__file__), '..', 'opentodo_media'))
+
 
 # URL that handles the media served from MEDIA_ROOT.
 # Note that this should have a trailing slash if it has a path component
 # MEDIA_URL = 'http://static.myhost.com' or MEDIA_URL = 'http://myhost.com/static/'
-MEDIA_URL = ''
+MEDIA_URL = '/static/'
 
 SEND_EMAILS = False       # make it True and edit settings bellow if you want to receive emails
 EMAIL_HOST = ''           # smtp.myhost.com

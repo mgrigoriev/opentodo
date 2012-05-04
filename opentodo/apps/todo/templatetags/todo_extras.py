@@ -1,24 +1,25 @@
 # -*- coding: utf-8 -*-
-
 from datetime import datetime, date
 import re
+
 from django.contrib.auth.models import User
-from todo.models import Status
 from django.utils.safestring import mark_safe
 from django import template
+
+from todo.models import Status
 
 register = template.Library()
 
 months = ('янв.','февр.','марта','апр.','мая','июня','июля','авг.','сент.','окт.','нояб.','дек.')
 
-"""
+@register.filter
+def format_deadline(dt, status):
+    """
     Форматирует дату срока задачи.
     Дата в прошлом, сегодня или завтра помечается красным цветом (если задача не завершена).
     Пример: dt|format_deadline:"1"
         где dt - переменная типа Date, 1 - статус задачи
-"""
-@register.filter
-def format_deadline(dt, status):
+    """
     if isinstance(dt, date):
         dt_str = format_date(dt)        
         diff = ( dt - datetime.now().date() ).days
@@ -28,12 +29,12 @@ def format_deadline(dt, status):
         dt_str = "&nbsp;"
     return mark_safe(dt_str)
 
-"""
-    Дата в формате '6 февр.' если год = текущему (иначе - в формате dd.mm.yyyy)
-    Если есть время, выводится также и оно (а если дата - сегодня, выводится только время)
-"""
 @register.filter
 def format_date(dt, option=""):
+    """
+    Дата в формате '6 февр.' если год = текущему (иначе - в формате dd.mm.yyyy)
+    Если есть время, выводится также и оно (а если дата - сегодня, выводится только время)
+    """
     dt_str = ''
     today = tomorrow = False
     dt_now = datetime.now().date()
@@ -67,19 +68,19 @@ def format_date(dt, option=""):
         dt_str = "&nbsp;"
     return mark_safe(dt_str)
 
-"""
-    Выделяет имя файла из пути
-"""
 @register.filter
 def attach(path):
+    """
+    Выделяет имя файла из пути
+    """
     import os
     return os.path.basename(path)
 
-"""
-    Размер файла в килобайтах
-"""
 @register.filter
 def size_kb(attached_file):
+    """
+    Размер файла в килобайтах
+    """
     try:
         size = attached_file.size
         import math
@@ -87,11 +88,11 @@ def size_kb(attached_file):
     except:
         return u'размер неизвестен'
 
-"""
-    Имя пользователя: Имя Фамилия (если указаны) или логин
-"""
 @register.filter
 def username(user):
+    """
+    Имя пользователя: Имя Фамилия (если указаны) или логин
+    """
     try:
         if user.first_name and user.last_name:
             return "%s %s" % (user.first_name, user.last_name)
@@ -100,12 +101,12 @@ def username(user):
     except:
         return ""
 
-"""
-    Вычисляет высоту дополнительной (нижней) строки в списке задач в зависимости от параметра - количества задач
-    (для того чтобы высота таблицы не была меньше высоты левого меню при небольшом количестве задач)
-"""
 @register.filter
 def extra_td_height(tasks_count):
+    """
+    Вычисляет высоту дополнительной (нижней) строки в списке задач в зависимости от параметра - количества задач
+    (для того чтобы высота таблицы не была меньше высоты левого меню при небольшом количестве задач)
+    """
     height1 = 130
     height2 = int(tasks_count)*27
     if (height1 > height2):
@@ -115,21 +116,21 @@ def extra_td_height(tasks_count):
         
     return "%s" % height
 
-"""
-    Обрезает длинные строки
-"""
 @register.filter
 def crop(text, count):
+    """
+    Обрезает длинные строки
+    """
     out = text[:int(count)]
     if len(text) > len(out):
         out += '&hellip;'
     return mark_safe(out)
 
-"""
-    Параметры доп. фильтра для отображения в подсказке ссылки
-"""
 @register.filter
 def filter_options(params, folder):
+    """
+    Параметры доп. фильтра для отображения в подсказке ссылки
+    """
     out = ''
 
     STATES_PLURAL = {1: u'Новые', 2: u'Принятые', 3: u'Завершенные', 4: u'Завершенные и одобренные'}
@@ -165,14 +166,14 @@ def filter_options(params, folder):
     return mark_safe(out)
 
 
-"""
+def sanitize_html(value):
+    """
     Замена '<' и '>' на '&lt;' и '&gt;' в html-тегах за исключением разрешенных;
     расстановка <br /> в конце строк за исключением текста внутри <pre>;
     форматирование списков: "- " в начале строки заменяется на тире.
 
     Разрешено: <a href="">, <b>, <i>, <pre> (для вставки кода)
-"""
-def sanitize_html(value):
+    """
     out = ''
     linebreaks = True
     lt = '&lt;'
