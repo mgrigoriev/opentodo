@@ -8,7 +8,12 @@ urlpatterns = patterns('',
     (r'^$', 'todo.views.index'),
     (r'^logout/$', 'django.contrib.auth.views.logout_then_login'),
     (r'^accounts/login/$', 'django.contrib.auth.views.login'),
-    (r'^admin/(.*)', admin.site.root),
+    (r'^admin/', include(admin.site.urls)),
+)
+
+# serve static
+urlpatterns += patterns('',
+    (r'^static/(.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
 )
 
 urlpatterns += patterns('todo.views',

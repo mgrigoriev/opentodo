@@ -117,7 +117,7 @@ $(document).ready(function(){
 		<td><nobr>{{t.author|username}}</nobr></td>
 		<td style="text-align:right">{{t.created_at|format_date:"short"}}</td>
 		<td><nobr>{{t.assigned_to|username|default:"&nbsp;"}}</nobr></td>
-		<td style="text-align:right">{{ t.deadline|format_deadline:t.status.id }}</td>
+		<td style="text-align:right">{{ t.deadline }}</td>
 		<td class="center"><div class="status status{{t.status.id}}">{% ifequal t.status.id 4 %}завершена{% else %}{{t.status.title|lower}}{% endifequal %}</div></td>
 	</tr>
 {% endfor %}
